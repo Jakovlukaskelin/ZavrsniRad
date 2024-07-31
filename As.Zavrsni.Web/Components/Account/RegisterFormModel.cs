@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace As.Zavrsni.Web.Components.Pages
+namespace As.Zavrsni.Web.Components.Account
 {
     public class RegisterFormModel
     {

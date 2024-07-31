@@ -2,7 +2,7 @@
 using As.Zavrsni.Domain.Entites;
 using Microsoft.AspNetCore.Components;
 
-namespace As.Zavrsni.Web.Components.Pages
+namespace As.Zavrsni.Web.Components.Account
 {
     public partial class Register : ComponentBase
     {
@@ -14,15 +14,16 @@ namespace As.Zavrsni.Web.Components.Pages
 
         [Inject]
         private IZavrsniDbContext DbContext { get; set; }
+
         public async Task RegisterUser()
-        {  
+        {
             var user = new User
             {
                 Username = Model.UserName,
                 Password = Model.Password
             };
 
-           DbContext.Users.Add(user);
+            DbContext.Users.Add(user);
             await DbContext.SaveChangesAsync();
             NavigationManager.NavigateTo("/");
         }
