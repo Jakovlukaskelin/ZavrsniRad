@@ -1,8 +1,11 @@
 using As.Zavrsni.Aplication;
 using As.Zavrsni.Aplication.Interface;
+using As.Zavrsni.Aplication.Services;
 using As.Zavrsni.Presistance;
 using As.Zavrsni.Web.Components;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Syncfusion.Blazor;
 using Syncfusion.Licensing;
 
@@ -18,9 +21,18 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<ZavrsniDbContext>(options =>
     options.UseSqlServer(connectionString));
 
- builder.Services.AddScoped<IZavrsniDbContext, ZavrsniDbContext>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IZavrsniDbContext, ZavrsniDbContext>();
 
 builder.Services.AddSyncfusionBlazor();
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+}).AddCookie(
+   options =>  options.LoginPath = "/login" );
 
 SyncfusionLicenseProvider.RegisterLicense("NRAiBiAaIQQuGjN/V0N+XU9Hc1RDX3xKf0x/TGpQb19xflBPallYVBYiSV9jS3pTdUdlWXZceXBURmBYUg==;Mgo+DSMBMAY9C3t2UFhhQlJBfV5AQmBIYVp/TGpJfl96cVxMZVVBJAtUQF1hTX5QdENjUH1XdHVVQ2Fe;MzE4NTA5MUAzMjM1MmUzMDJlMzBBWDBvc3JXRm0xdXlGZVNLdzN5WXNUMjVUVWNkYW5aVHJUejhvSDFHTlMwPQ==");
 var app = builder.Build();

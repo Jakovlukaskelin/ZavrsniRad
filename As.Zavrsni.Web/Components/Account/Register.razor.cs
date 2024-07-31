@@ -25,7 +25,7 @@ namespace As.Zavrsni.Web.Components.Account
 
             DbContext.Users.Add(user);
             await DbContext.SaveChangesAsync();
-            NavigationManager.NavigateTo("/");
+            NavigationManager.NavigateTo("/Login");
         }
     }
 }

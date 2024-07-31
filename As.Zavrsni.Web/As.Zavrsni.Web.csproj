@@ -7,6 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="wwwroot\ReadMEts.md" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="tailwind.config.js" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Azure.Core" Version="1.41.0" />
     <PackageReference Include="Azure.Identity" Version="1.12.0" />
     <PackageReference Include="Azure.ResourceManager.Sql" Version="1.2.1" />
@@ -17,6 +25,10 @@
     <ProjectReference Include="..\As.Zavrsni.Aplication\As.Zavrsni.Aplication.csproj" />
     <ProjectReference Include="..\As.Zavrsni.Domain\As.Zavrsni.Domain.csproj" />
     <ProjectReference Include="..\As.Zavrsni.Presistance\As.Zavrsni.Presistance.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <TypeScriptCompile Include="wwwroot\ReadMEts.md" />
   </ItemGroup>
 
 </Project>
