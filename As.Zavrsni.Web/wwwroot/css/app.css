@@ -112,3 +112,98 @@ body {
         .login-container a:hover {
             text-decoration: underline;
         }
+
+
+
+.sidebar-navigation {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 245px;
+    background-color: white;
+    color: #454545;
+    /*.sidebar-account {
+      color: #777;
+      font-size: 14px;
+      padding: 10px 10px 5px 10px;
+  }*/
+}
+
+    .sidebar-navigation .active > a {
+        color: #c4000a;
+        position: relative;
+    }
+
+        .sidebar-navigation .active > a::after {
+            content: " ";
+            width: 0;
+            height: 0;
+            border-top: 6px solid transparent;
+            border-bottom: 6px solid transparent;
+            border-left: 10px solid #d34047;
+            position: absolute;
+            right: 11px;
+            top: 13px;
+        }
+
+    .sidebar-navigation .sidebar-footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 245px;
+        margin-bottom: 25px;
+    }
+
+    .sidebar-navigation a {
+        color: #777;
+    }
+
+    .sidebar-navigation .sidebar-header {
+        padding: 10px 10px 10px 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .sidebar-navigation .sidebar-link {
+        display: block;
+        margin-bottom: 1px;
+        padding: 10px;
+        font-size: 14px;
+    }
+
+        .sidebar-navigation .sidebar-link:hover {
+            text-decoration: none;
+            background-color: #f2f2f2;
+        }
+
+    .sidebar-navigation .choose-company-wrapper {
+        padding: 0 10px 10px 10px;
+    }
+
+    .sidebar-navigation .localization-wrapper {
+        padding: 0 10px;
+    }
+
+    .sidebar-navigation .logout-button-wrapper {
+        padding: 0 10px;
+        margin-top: 10px;
+    }
+
+        .sidebar-navigation .logout-button-wrapper .e-btn {
+            width: 100%;
+        }
+
+    .sidebar-navigation .company-name-wrapper {
+        display: flex;
+        margin-top: 10px;
+        padding-left: 8px;
+        height: 29px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        align-items: center;
+        justify-content: start;
+        font-size: 14px;
+        color: #495057;
+    }
