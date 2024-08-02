@@ -1,7 +1,73 @@
 ﻿@page "/users"
+@using As.Zavrsni.Aplication.Model
+@using As.Zavrsni.Web.Components.Helpers
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Data
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Popups
+@using Syncfusion.Blazor.Inputs
+@rendermode InteractiveServer
+@inject NavigationManager NavigationManager
 
-<h3>CrudUser</h3>
+<div class="flex">
+    <div class="w-60 h-screen bg-white border-r text-xs fixed top-0 left-0 shadow-md">
+        <div class="h-11 flex items-center px-5 border-b">
+            <button @onclick="Logout" class="flex items-center gap-2 text-info-400 font-semibold hover:text-info-600">
+                <span class="material-symbols-outlined !text-sm">Logout</span>
+            </button>
+        </div>
 
-@code {
+        <div class="px-3 py-3 text-neutral-400 font-semibold tracking-wide">ADMINISTRACIJA</div>
+        <div class="nav-items">
+            <nav class="flex flex-col">
+                <NavLink class="nav-item flex items-center px-5 py-3 hover:bg-gray-100 transition-colors duration-200" href="/dashboard" Match="NavLinkMatch.All">
+                    <span class="material-symbols-outlined !text-lg">Dashboard</span>
+                </NavLink>
+                <NavLink class="nav-item flex items-center px-5 py-3 hover:bg-gray-100 transition-colors duration-200" href="/users" Match="NavLinkMatch.All">
+                    <span class="material-symbols-outlined !text-lg">Korisnici</span>
+                </NavLink>
+            </nav>
+        </div>
+    </div>
 
-}
+    <div class="flex-1 ml-60 p-6 bg-gray-50">
+        <div class="container mx-auto shadow-lg p-6 bg-white rounded-lg">
+            <SfButton CssClass="e-primary" @onclick="OpenAddUserDialog">Add New User</SfButton>
+
+            <SfGrid @ref="Grid" DataSource="@Users" AllowPaging="true" AllowSorting="true" AllowFiltering="true" Toolbar="@(new List<string> { "Search" })">
+                <GridColumns>
+                    <GridColumn Field="UserId" HeaderText="ID" IsPrimaryKey="true" TextAlign="TextAlign.Center" Width="120"></GridColumn>
+                    <GridColumn Field="Username" HeaderText="Username" Width="150"></GridColumn>
+                    <GridColumn Field="Password" HeaderText="Password" Width="200"></GridColumn>
+                </GridColumns>
+            </SfGrid>
+        </div>
+    </div>
+</div>
+
+<SfDialog Width="400px" IsModal="true" @bind-Visible="@isDialogVisible" CssClass="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 p-4">
+    <div class="bg-white p-6 rounded-lg shadow-md w-full max-w-lg">
+        <DialogTemplates>
+            <Header>
+                <h2 class="text-xl font-semibold">@(isEdit ? "Edit User" : "Add User")</h2>
+            </Header>
+            <Content>
+                <EditForm Model="@currentUser" OnValidSubmit="@SaveUser">
+                    <DataAnnotationsValidator />
+                    <div class="form-group mb-4">
+                        <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
+                        <SfTextBox Id="username" @bind-Value="currentUser.Username" CssClass="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-info-500 focus:border-info-500 sm:text-sm" />
+                    </div>
+                    <div class="form-group mb-4">
+                        <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                        <SfTextBox Id="password" @bind-Value="currentUser.Password" CssClass="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-info-500 focus:border-info-500 sm:text-sm" />
+                    </div>
+                    <div class="flex justify-end space-x-2">
+                        <SfButton CssClass="e-primary" Type="Submit">Save</SfButton>
+                        <SfButton CssClass="e-flat" @onclick="CloseDialog">Cancel</SfButton>
+                    </div>
+                </EditForm>
+            </Content>
+        </DialogTemplates>
+    </div>
+</SfDialog>

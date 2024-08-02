@@ -1,0 +1,33 @@
+﻿@using As.Zavrsni.Web.Components.Helpers
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Navigations
+@implements IDisposable
+@inject NavigationManager NavigationManager
+
+@page "/dashboard"
+
+<h3>Dashboard</h3>
+
+<div class="w-60 h-screen bg-white border-r text-xs fixed top-0 left-0">
+    <div class="h-11 flex items-center px-5">
+        <button @onclick="Logout" class="flex items-center gap-2 text-info-400 font-semibold hover:text-info-600">
+            <span class="material-symbols-outlined !text-sm">Logout</span>
+        </button>
+    </div>
+
+    <div class="px-3 py-3 text-neutral-400 font-semibold tracking-wide">ADMINISTRACIJA</div>
+    <div class="nav-items">
+        <nav class="flex-column">
+            <div class="w-full @(currentUrl == "dashboard" ? "active" : "")">
+                <NavLink class="nav-item" href="/dashboard" Match="NavLinkMatch.All">
+                    <span class="material-symbols-outlined !text-lg">Dashboard</span>
+                </NavLink>
+            </div>
+            <div class="w-full @(currentUrl == "users" ? "active" : "")">
+                <NavLink class="nav-item" href="/users" Match="NavLinkMatch.All">
+                    <span class="material-symbols-outlined fill !text-lg">Korisnici</span>
+                </NavLink>
+            </div>
+        </nav>
+    </div>
+</div>

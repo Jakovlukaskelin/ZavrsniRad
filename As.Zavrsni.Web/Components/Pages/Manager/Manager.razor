@@ -8,7 +8,7 @@
 <div class="w-60 h-screen bg-white border-r text-xs fixed top-0 left-0">
     <div class="h-11 flex items-center px-5">
         <button @onclick="Logout" class="flex items-center gap-2 text-info-400 font-semibold hover:text-info-600">
-            <span class="material-symbols-outlined !text-sm">Logout</span> @users?.username
+            <span class="material-symbols-outlined !text-sm">Logout</span>
         </button>
     </div>
 
@@ -20,12 +20,13 @@
                     <span class="material-symbols-outlined !text-lg">Dashboard</span>
                 </NavLink>
             </div>
-            <div class="w-full @(currentUrl == "products" ? "active" : "")">
+            <div class="w-full @(currentUrl == "users" ? "active" : "")">
                 <NavLink class="nav-item" href="/users" Match="NavLinkMatch.All">
-                    <span class="material-symbols-outlined fill !text-lg">Korisnici</span> 
+                    <span class="material-symbols-outlined fill !text-lg">Korisnici</span>
                 </NavLink>
             </div>
         </nav>
     </div>
-   
 </div>
+
+

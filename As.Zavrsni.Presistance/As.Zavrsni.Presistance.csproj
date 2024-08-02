@@ -22,6 +22,8 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Syncfusion.Blazor.Data" Version="26.2.7" />
+    <PackageReference Include="Syncfusion.Blazor.Grid" Version="26.2.7" />
+    <PackageReference Include="Syncfusion.Blazor.Popups" Version="26.2.7" />
   </ItemGroup>
 
   <ItemGroup>

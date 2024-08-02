@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -15,6 +15,77 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="wwwroot\Syncfusion\customized\tailwind.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\base\base.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\buttons\button.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\buttons\check-box.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\buttons\chips.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\buttons\floating-action-button.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\buttons\radio-button.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\buttons\speed-dial.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\buttons\switch.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\calendars\calendar.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\calendars\datepicker.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\calendars\daterangepicker.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\calendars\datetimepicker.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\calendars\timepicker.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\dropdowns\auto-complete.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\dropdowns\combo-box.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\dropdowns\drop-down-base.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\dropdowns\drop-down-list.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\dropdowns\drop-down-tree.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\dropdowns\list-box.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\dropdowns\mention.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\dropdowns\multi-select.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\grids\excel-filter.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\grids\grid.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\inplace-editor\inplace-editor.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\inputs\color-picker.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\inputs\input.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\inputs\maskedtextbox.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\inputs\numerictextbox.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\inputs\rating.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\inputs\slider.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\inputs\textbox.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\inputs\uploader.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\layouts\card.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\layouts\splitter.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\layouts\timeline.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\lists\list-view.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\lists\sortable.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\navigations\accordion.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\navigations\appbar.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\navigations\breadcrumb.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\navigations\carousel.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\navigations\context-menu.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\navigations\h-scroll.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\navigations\menu.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\navigations\pager.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\navigations\sidebar.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\navigations\stepper.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\navigations\tab.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\navigations\toolbar.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\navigations\treeview.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\navigations\v-scroll.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\notifications\badge.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\notifications\message.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\notifications\skeleton.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\notifications\toast.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\popups\dialog.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\popups\popup.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\popups\spinner.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\popups\tooltip.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\richtexteditor\rich-text-editor.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\schedule\recurrence-editor.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\schedule\schedule.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\splitbuttons\button-group.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\splitbuttons\drop-down-button.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\splitbuttons\progress-button.scss" />
+    <None Include="wwwroot\Syncfusion\individual-scss\splitbuttons\split-button.scss" />
+    <None Include="wwwroot\Syncfusion\tailwind.scss" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Azure.Core" Version="1.41.0" />
     <PackageReference Include="Azure.Identity" Version="1.12.0" />
     <PackageReference Include="Azure.ResourceManager.Sql" Version="1.2.1" />
@@ -24,6 +95,8 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Syncfusion.Blazor.Data" Version="26.2.7" />
+    <PackageReference Include="Syncfusion.Blazor.Grid" Version="26.2.7" />
+    <PackageReference Include="Syncfusion.Blazor.Popups" Version="26.2.7" />
   </ItemGroup>
 
   <ItemGroup>
@@ -35,5 +108,7 @@
   <ItemGroup>
     <TypeScriptCompile Include="wwwroot\ReadMEts.md" />
   </ItemGroup>
+
+  
 
 </Project>
