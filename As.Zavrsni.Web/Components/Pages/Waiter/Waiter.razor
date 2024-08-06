@@ -1,7 +1,57 @@
 ﻿@page "/Waiter"
+@using As.Zavrsni.Aplication.Products.Model
+@using Syncfusion.Blazor.DropDowns
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor
+@using Syncfusion.Blazor.Data
 
 
+<div class="text-3xl font-bold mb-4 text-center">
+    Dobrodošli
+</div>
 
-<h3 class="w-40">Waiter</h3>
+<div class="flex">
+    <div class="flex-1">
+        <SfDropDownList TValue="string" TItem="string" DataSource="@productTypes" @bind-Value="selectedProductType" Placeholder="Select Product Type" Change="@OnProductTypeChange">
+        </SfDropDownList>
 
+        <SfGrid DataSource="@filteredProducts">
+            <GridColumns>
+                <GridColumn Field="@nameof(ProductsModel.ProductName)" HeaderText="Product Name" Width="150"></GridColumn>
+                <GridColumn Field="@nameof(ProductsModel.ProductType)" HeaderText="Type" Width="150"></GridColumn>
+                <GridColumn Field="@nameof(ProductsModel.Quantity)" HeaderText="Quantity" Width="100"></GridColumn>
+                <GridColumn Field="@nameof(ProductsModel.ExpiryDate)" HeaderText="Expiry Date" Width="150"></GridColumn>
+                <GridColumn HeaderText="Select" Width="100" TextAlign="TextAlign.Center">
+                    <Template>
+                        <button class="py-2 px-4 bg-blue-500 text-black rounded" @onclick="() => SelectProduct(context as ProductsModel)">Select</button>
+                    </Template>
+                </GridColumn>
+            </GridColumns>
+        </SfGrid>
+    </div>
 
+    <div class="flex-1 ml-4">
+        <div class="p-4 border border-gray-200 rounded">
+            <h2 class="text-xl font-bold mb-4">Order Product</h2>
+            @if (selectedProduct != null)
+            {
+                <div>
+                    <label class="block text-sm font-medium mb-2">Product Name: @selectedProduct.ProductName</label>
+                    <label class="block text-sm font-medium mb-2">Quantity:</label>
+                    <SfNumericTextBox TValue="int" Value="@orderQuantity" Min="1" Max="@selectedProduct.Quantity" Placeholder="Enter quantity"></SfNumericTextBox>
+                    <button class="mt-4 py-2 px-4 bg-blue-500 text-black rounded" @onclick="AddProductToOrder">Add to Order</button>
+                </div>
+            }
+            <h3 class="text-lg font-bold mt-4">Selected Products</h3>
+            <ul>
+                @foreach (var item in orderItems)
+                {
+                    <li class="flex justify-between mb-2">
+                        <span>@item.ProductName - Quantity: @item.Quantity</span>
+                        <button class="ml-4 py-1 px-2 bg-red-500 text-black rounded" @onclick="() => RemoveProductFromOrder(item)">Remove</button>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>
