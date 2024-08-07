@@ -16,6 +16,7 @@ namespace As.Zavrsni.Aplication.Model
         public int UserId { get; set; }
         public string username { get; set; } 
         public string password { get; set; }
+        public int? RoleId { get; set; }
 
         public void CreateMappings(Profile configuration)
         {

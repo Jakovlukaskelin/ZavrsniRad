@@ -31,11 +31,13 @@ namespace As.Zavrsni.Aplication.Products.Query
         public async Task<List<ProductsModel>> Handle(GetProductListQuery request, CancellationToken cancellationToken)
         {
             var productEntities = await this._context.Products
+                 .AsNoTracking()
                 .ProjectTo<ProductsModel>(_mapper.ConfigurationProvider)
                 .ToListAsync(cancellationToken);
 
            
             return productEntities;
         }
+        
     }
 }

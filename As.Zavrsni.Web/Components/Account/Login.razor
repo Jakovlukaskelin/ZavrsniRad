@@ -1,24 +1,22 @@
 ﻿@page "/"
 @page "/login"
 
+<div class="flex justify-center min-h-screen bg-blue-400 items-center">
+    <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm">
+        <h3 class="text-2xl font-bold mb-4 text-center">Login</h3>
 
-<div class="justify-center bg-blue-400">
-    <h3>Login</h3>
-
-    <EditForm  Model="Model" OnValidSubmit="HandleLogin" FormName="login" metod ="post">
-       
-
-        <div class="form-group">
-            <label for="username">Username</label>
-            <InputText id="username" @bind-Value="Model.Username" class="form-control" />
-        </div>
-        <div class="form-group">
-            <label for="password">Password</label>
-            <InputText id="password" @bind-Value="Model.Password" type="password" class="form-control" />
-        </div>
-        <div class="form-group">
-            <button type="submit" class="btn btn-primary">Login</button>
-        </div>
-    </EditForm>
-
+        <EditForm Model="Model" OnValidSubmit="HandleLogin" FormName="login" method="post">
+            <div class="mb-4">
+                <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
+                <InputText id="username" @bind-Value="Model.Username" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" />
+            </div>
+            <div class="mb-6">
+                <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                <InputText id="password" @bind-Value="Model.Password" type="password" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" />
+            </div>
+            <div>
+                <button type="submit" class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition duration-200">Login</button>
+            </div>
+        </EditForm>
+    </div>
 </div>

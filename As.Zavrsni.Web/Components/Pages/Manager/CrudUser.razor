@@ -1,5 +1,6 @@
 ﻿@page "/users"
 @using As.Zavrsni.Aplication.Model
+@using As.Zavrsni.Domain.Entites
 @using As.Zavrsni.Web.Components.Helpers
 @using Syncfusion.Blazor.Buttons
 @using Syncfusion.Blazor.Data
@@ -7,6 +8,7 @@
 @using Syncfusion.Blazor.Popups
 @using Syncfusion.Blazor.Inputs
 @rendermode InteractiveServer
+
 @inject NavigationManager NavigationManager
 
 <div class="flex">
@@ -34,22 +36,32 @@
         <div class="container mx-auto shadow-lg p-6 bg-white rounded-lg">
             <SfButton CssClass="e-primary" @onclick="OpenAddUserDialog">Add New User</SfButton>
 
-            <SfGrid @ref="Grid" DataSource="@Users" AllowPaging="true" AllowSorting="true" AllowFiltering="true" Toolbar="@(new List<string> { "Search" })">
+            <SfGrid @ref="Grid" DataSource="@Users" AllowPaging="true" AllowSorting="true" Toolbar="@(new List<string> { "Search" })">
                 <GridColumns>
                     <GridColumn Field="UserId" HeaderText="ID" IsPrimaryKey="true" TextAlign="TextAlign.Center" Width="120"></GridColumn>
                     <GridColumn Field="Username" HeaderText="Username" Width="150"></GridColumn>
                     <GridColumn Field="Password" HeaderText="Password" Width="200"></GridColumn>
+                    <GridColumn Field="RoleId" HeaderText="Role ID" Width="150"></GridColumn>
+                    <GridColumn HeaderText="Actions" Width="150">
+                        <Template>
+                            @{
+                                var user = context as User;
+                            }
+                            <SfButton CssClass="e-flat" @onclick="() => OpenEditUserDialog(user)">Edit</SfButton>
+                        </Template>
+                    </GridColumn>
                 </GridColumns>
             </SfGrid>
         </div>
     </div>
 </div>
 
-<SfDialog Width="400px" IsModal="true" @bind-Visible="@isDialogVisible" CssClass="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 p-4">
+<!-- Add User Dialog -->
+<SfDialog Width="400px" IsModal="true" @bind-Visible="@isAddDialogVisible" CssClass="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 p-4">
     <div class="bg-white p-6 rounded-lg shadow-md w-full max-w-lg">
         <DialogTemplates>
             <Header>
-                <h2 class="text-xl font-semibold">@(isEdit ? "Edit User" : "Add User")</h2>
+                <h2 class="text-xl font-semibold">Add User</h2>
             </Header>
             <Content>
                 <EditForm Model="@currentUser" OnValidSubmit="@SaveUser">
@@ -62,9 +74,52 @@
                         <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
                         <SfTextBox Id="password" @bind-Value="currentUser.Password" CssClass="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-info-500 focus:border-info-500 sm:text-sm" />
                     </div>
+                    <div class="form-group mb-4">
+                        <label for="role" class="block text-sm font-medium text-gray-700">Role</label>
+                        <SfDropDownList Id="role" @bind-Value="currentUser.RoleId" DataSource="@(new List<object> { new { Id = 1, Name = "Konobar" }, new { Id = 3, Name = "Kuhar" } })" TItem="object" TValue="int?" Placeholder="Select Role" CssClass="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-info-500 focus:border-info-500 sm:text-sm">
+                            <DropDownListFieldSettings Value="Id" Text="Name" />
+                        </SfDropDownList>
+                    </div>
+
                     <div class="flex justify-end space-x-2">
                         <SfButton CssClass="e-primary" Type="Submit">Save</SfButton>
-                        <SfButton CssClass="e-flat" @onclick="CloseDialog">Cancel</SfButton>
+                        <SfButton CssClass="e-flat" Type="button" @onclick="CloseAddDialog">Cancel</SfButton>
+                    </div>
+                </EditForm>
+            </Content>
+        </DialogTemplates>
+    </div>
+</SfDialog>
+
+<!-- Edit User Dialog -->
+<SfDialog Width="400px" IsModal="true" @bind-Visible="@isEditDialogVisible" CssClass="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 p-4">
+    <div class="bg-white p-6 rounded-lg shadow-md w-full max-w-lg">
+        <DialogTemplates>
+            <Header>
+                <h2 class="text-xl font-semibold">Edit User</h2>
+            </Header>
+            <Content>
+                <EditForm Model="@currentUser" OnValidSubmit="@SaveUser">
+                    <DataAnnotationsValidator />
+                    <div class="form-group mb-4">
+                        <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
+                        <SfTextBox Id="username" @bind-Value="currentUser.Username" CssClass="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-info-500 focus:border-info-500 sm:text-sm" />
+                    </div>
+                    <div class="form-group mb-4">
+                        <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                        <SfTextBox Id="password" @bind-Value="currentUser.Password" CssClass="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-info-500 focus:border-info-500 sm:text-sm" />
+                    </div>
+                    <div class="form-group mb-4">
+                        <label for="role" class="block text-sm font-medium text-gray-700">Role</label>
+                        <SfDropDownList Id="role" @bind-Value="currentUser.RoleId" DataSource="@(new List<object> { new { Id = 1, Name = "Konobar" }, new { Id = 3, Name = "Kuhar" } })" TItem="object" TValue="int?" Placeholder="Select Role" CssClass="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-info-500 focus:border-info-500 sm:text-sm">
+                            <DropDownListFieldSettings Value="Id" Text="Name" />
+                        </SfDropDownList>
+                    </div>
+
+                    <div class="flex justify-end space-x-2">
+                        <SfButton CssClass="e-primary" Type="Submit">Save</SfButton>
+                        <SfButton CssClass="e-danger" Type="button" @onclick="() => DeleteUser(currentUser)">Delete</SfButton>
+                        <SfButton CssClass="e-flat" Type="button" @onclick="CloseEditDialog">Cancel</SfButton>
                     </div>
                 </EditForm>
             </Content>

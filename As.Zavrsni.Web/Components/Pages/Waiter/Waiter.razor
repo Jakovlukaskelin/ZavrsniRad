@@ -4,18 +4,25 @@
 @using Syncfusion.Blazor.Grids
 @using Syncfusion.Blazor
 @using Syncfusion.Blazor.Data
-
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.Notifications
 
 <div class="text-3xl font-bold mb-4 text-center">
     Dobrodošli
 </div>
+<div >
+    <button class="py-2 px-4 text-black hover:bg-red-600  bg-red-300 rounded" @onclick="() => Logout()">Logout</button>
+</div>
+<div class="flex justify-center mb-4">
+    <button class="py-2 px-4 bg-green-500 text-black rounded mx-2" @onclick='() => OnProductTypeChange("Hrana")'>Food</button>
+    <button class="py-2 px-4 bg-blue-500 text-black rounded mx-2" @onclick='() => OnProductTypeChange("Drinks")'>Drinks</button>
+    <button class="py-2 px-4 bg-gray-500 text-black rounded mx-2" @onclick="() => OnProductTypeChange(null)">All</button>
+</div>
+
 
 <div class="flex">
     <div class="flex-1">
-        <SfDropDownList TValue="string" TItem="string" DataSource="@productTypes" @bind-Value="selectedProductType" Placeholder="Select Product Type" Change="@OnProductTypeChange">
-        </SfDropDownList>
-
-        <SfGrid DataSource="@filteredProducts">
+        <SfGrid DataSource="@filteredProducts" AllowFiltering="true">
             <GridColumns>
                 <GridColumn Field="@nameof(ProductsModel.ProductName)" HeaderText="Product Name" Width="150"></GridColumn>
                 <GridColumn Field="@nameof(ProductsModel.ProductType)" HeaderText="Type" Width="150"></GridColumn>
@@ -38,7 +45,7 @@
                 <div>
                     <label class="block text-sm font-medium mb-2">Product Name: @selectedProduct.ProductName</label>
                     <label class="block text-sm font-medium mb-2">Quantity:</label>
-                    <SfNumericTextBox TValue="int" Value="@orderQuantity" Min="1" Max="@selectedProduct.Quantity" Placeholder="Enter quantity"></SfNumericTextBox>
+                    <SfNumericTextBox TValue="int" @bind-Value="orderQuantity" Min="1" Max="@selectedProduct.Quantity" Placeholder="Enter quantity"></SfNumericTextBox>
                     <button class="mt-4 py-2 px-4 bg-blue-500 text-black rounded" @onclick="AddProductToOrder">Add to Order</button>
                 </div>
             }
@@ -52,6 +59,11 @@
                     </li>
                 }
             </ul>
+            <button class="mt-4 py-2 px-4 bg-green-500 text-black rounded" @onclick="SubmitOrder">Submit Order</button>
         </div>
     </div>
 </div>
+
+<SfToast @ref="toast" Timeout="5000" Title="Low Stock Alert" Content="@toastMessage">
+    <ToastPosition X="Right" Y="Top"></ToastPosition>
+</SfToast>
