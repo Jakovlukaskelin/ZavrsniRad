@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net.Http.Json;
 using System.Text;
 using System.Threading.Tasks;
+using BCrypt.Net;
 
 namespace As.Zavrsni.Aplication.Services
 {
@@ -20,12 +21,29 @@ namespace As.Zavrsni.Aplication.Services
         }
 
 
-    
 
-        public async Task<User> Login(string username, string password)
+
+        public async Task<User?> Login(string username, string password)
         {
-            return await _context.Users
-              .FirstOrDefaultAsync(u => u.Username == username && u.Password == password);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+            if (user != null)
+            {
+                
+                if (BCrypt.Net.BCrypt.Verify(password, user.Password))
+                {
+                    return user;
+                }
+               
+                else if (user.Password == password)
+                {
+                  
+                    user.Password = BCrypt.Net.BCrypt.HashPassword(password);
+                    await _context.SaveChangesAsync();
+                    return user;
+                }
+            }
+            return null;
         }
+
     }
 }

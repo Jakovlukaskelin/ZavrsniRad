@@ -4,6 +4,7 @@ using As.Zavrsni.Aplication.Products.Query;
 using As.Zavrsni.Domain.Entites;
 using MediatR;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.EntityFrameworkCore;
 using Syncfusion.Blazor.Inputs;
 using Syncfusion.Blazor.Notifications;
@@ -24,19 +25,37 @@ namespace As.Zavrsni.Web.Components.Pages.Waiter
         private NavigationManager NavigationManager { get; set; }
         public List<ProductsModel> Products { get; set; } = new List<ProductsModel>();
         public List<ProductsModel> filteredProducts { get; set; } = new List<ProductsModel>();
-     
-        public string selectedProductType { get; set; }
+         public string selectedProductType { get; set; }
         public ProductsModel selectedProduct { get; set; }
-        public int orderQuantity { get; set; } = 1;
+        public int OrderQuantity { get; set; } = 1;
         private SfToast toast;
         private string toastMessage;
         public List<OrderItem> orderItems { get; set; } = new List<OrderItem>();
 
+        private HubConnection hubConnection;
+
+        private string errorMessage;
+
         protected override async Task OnInitializedAsync()
         {
-            Products = await Mediator.Send(new GetProductListQuery());
             
+            Products = await Mediator.Send(new GetProductListQuery());
+           
             filteredProducts = Products;
+            hubConnection = new HubConnectionBuilder().WithUrl(NavigationManager.ToAbsoluteUri("/orderhub")).Build();
+            hubConnection.On<string>("ReceiveOrderUpdate", (message) =>
+            {
+                ShowOrderNotification(message);
+            });
+
+            await hubConnection.StartAsync();
+        }
+
+        private void ShowOrderNotification(string message)
+        {
+            toastMessage = $"Order Update: {message}";
+            toast.ShowAsync(new ToastModel { Title = "Order Update", Content = toastMessage });
+            
         }
 
         private void OnProductTypeChange(string productType)
@@ -49,9 +68,9 @@ namespace As.Zavrsni.Web.Components.Pages.Waiter
         {
             if (selectedProductType == "Hrana")
             {
-                filteredProducts = Products.Where(p => p.ProductType == "Hrana").ToList();
+                filteredProducts = Products.Where(p => p.ProductType == "Hrana").OrderBy(x => x.ExpiryDate).ToList();
             }
-            else if (selectedProductType == "Drinks")
+            else if (selectedProductType == "Pica")
             {
                 filteredProducts = Products.Where(p => p.ProductType != "Hrana").ToList();
             }
@@ -59,32 +78,33 @@ namespace As.Zavrsni.Web.Components.Pages.Waiter
             {
                 filteredProducts = Products;
             }
+            StateHasChanged();
         }
 
         private void SelectProduct(ProductsModel product)
         {
             selectedProduct = product;
-            orderQuantity = 1;
+            OrderQuantity = 1;
         }
 
         private void AddProductToOrder()
         {
-            if (selectedProduct != null && orderQuantity > 0 && orderQuantity <= selectedProduct.Quantity)
+            if (selectedProduct != null && OrderQuantity > 0 && OrderQuantity <= selectedProduct.Quantity)
             {
                 var existingItem = orderItems.FirstOrDefault(i => i.ProductName == selectedProduct.ProductName);
                 if (existingItem != null)
                 {
-                    existingItem.Quantity += orderQuantity;
+                    existingItem.Quantity += OrderQuantity;
                 }
                 else
                 {
                     orderItems.Add(new OrderItem
                     {
                         ProductName = selectedProduct.ProductName,
-                        Quantity = orderQuantity
+                        Quantity = OrderQuantity
                     });
                 }
-                selectedProduct.Quantity -= orderQuantity;
+                selectedProduct.Quantity -= OrderQuantity;
 
                 // Check for low stock and show notification
                 if (selectedProduct.Quantity <= 10)
@@ -93,8 +113,9 @@ namespace As.Zavrsni.Web.Components.Pages.Waiter
                 }
 
                 selectedProduct = null;
-                orderQuantity = 1;
+                OrderQuantity = 1;
                 FilterProducts();
+                StateHasChanged();
             }
         }
 
@@ -107,49 +128,79 @@ namespace As.Zavrsni.Web.Components.Pages.Waiter
             }
             orderItems.Remove(item);
             FilterProducts();
+            StateHasChanged();
         }
 
         private async Task SubmitOrder()
         {
-            if (orderItems == null || orderItems.Count == 0)
+            errorMessage = string.Empty;
+            try
             {
-                throw new InvalidOperationException("No items in the order to submit.");
-            }
-
-            foreach (var item in orderItems)
-            {
-                if (item == null)
+                if (orderItems == null || !orderItems.Any())
                 {
-                    continue; // Skip null items
+                    throw new Exception("No items in the order to submit.");
                 }
 
-                var product = await _context.Products.FirstOrDefaultAsync(p => p.ProductName == item.ProductName);
-                if (product != null)
+                foreach (var item in orderItems)
                 {
-                    if (product.ProductType == null)
+                    if (item == null)
                     {
-                        throw new InvalidOperationException("Product type is null.");
+                        continue; // Skip null items
                     }
 
-                    product.Quantity -= item.Quantity;
-
-                    var consumption = new Consumption
+                    var product = await _context.Products.FirstOrDefaultAsync(p => p.ProductName == item.ProductName);
+                    if (product != null)
                     {
-                        ProductId = product.ProductId,
-                        ConsumptionDate = DateOnly.FromDateTime(DateTime.Now),
-                        Quantity = item.Quantity,
-                        Type = product.ProductType
-                    };
+                        if (string.IsNullOrEmpty(product.ProductType))
+                        {
+                            throw new InvalidOperationException("Product type is null or empty.");
+                        }
 
-                    _context.Consumptions.Add(consumption);
-                    _context.Products.Update(product);
+                        product.Quantity -= item.Quantity;
+
+                        var consumption = new Consumption
+                        {
+                            ProductId = product.ProductId,
+                            ConsumptionDate = DateOnly.FromDateTime(DateTime.Now),
+                            Quantity = item.Quantity,
+                            Type = product.ProductType
+                        };
+
+                        _context.Consumptions.Add(consumption);
+                        _context.Products.Update(product);
+                    }
+                }
+                bool allHrana = orderItems.All(item =>
+                {
+                    var product = Products.FirstOrDefault(p => p.ProductName == item.ProductName);
+                    return product != null && product.ProductType == "Hrana";
+                });
+                var orderDetails = string.Join(", ", orderItems.Select(i => $"{i.ProductName} (x{i.Quantity})"));
+                orderItems.Clear();
+                FilterProducts();
+               
+                await _context.SaveChangesAsync();
+                await LoadProducts();
+                StateHasChanged();
+                if (allHrana)
+                {
+                    await hubConnection.SendAsync("SendOrderUpdate", $"New Hrana order submitted: {orderDetails}");
                 }
             }
-
-            orderItems.Clear();
+            catch (InvalidOperationException ex)
+            {
+                errorMessage = ex.Message;
+            }
+            catch (Exception ex)
+            {
+                errorMessage = $"Nema proizvoda za narčit dodajte neki proizvod: {ex.Message}";
+            }
+        }
+        private async Task LoadProducts()
+        {
+            Products = await Mediator.Send(new GetProductListQuery());
             FilterProducts();
-
-            await _context.SaveChangesAsync();
+            StateHasChanged();
         }
 
         private void ShowLowStockNotification(string productName, int quantity)

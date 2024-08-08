@@ -20,7 +20,7 @@ namespace As.Zavrsni.Web.Components.Account
         [Inject]
         private IAuthService AuthService { get; set; }
 
-
+        public string ErrorMessage { get; set; }
         protected override async Task OnInitializedAsync()
         {
             Model ??= new();
@@ -30,28 +30,36 @@ namespace As.Zavrsni.Web.Components.Account
         }
         private async Task HandleLogin()
         {
-            var user = await AuthService.Login(Model.Username, Model.Password);
-            if (user != null)
+            try
             {
-                switch (user.RoleId)
+                var user = await AuthService.Login(Model.Username, Model.Password);
+                if (user != null)
                 {
-                    case 1:
-                        NavigationManager.NavigateTo("/waiter");
-                        break;
-                    case 2:
-                        NavigationManager.NavigateTo("/manager");
-                        break;
-                    case 3:
-                        NavigationManager.NavigateTo("/chef");
-                        break;
-                    default:
-
-                        break;
+                    switch (user.RoleId)
+                    {
+                        case 1:
+                            NavigationManager.NavigateTo("/waiter");
+                            break;
+                        case 2:
+                            NavigationManager.NavigateTo("/manager");
+                            break;
+                        case 3:
+                            NavigationManager.NavigateTo("/chef");
+                            break;
+                        default:
+                            throw new Exception("User role not recognized");
+                    }
                 }
+                else
+                {
+                    ErrorMessage = "Invalid username or password";
+                }
+                
             }
-            else
+            catch (Exception ex)
             {
-                throw new Exception("Invalid username or password");
+
+                ErrorMessage = ex.Message;
             }
         }
 

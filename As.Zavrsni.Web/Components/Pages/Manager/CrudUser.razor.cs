@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Syncfusion.Blazor.Grids;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using BCrypt.Net;
 
 namespace As.Zavrsni.Web.Components.Pages.Manager
 {
@@ -55,7 +56,7 @@ namespace As.Zavrsni.Web.Components.Pages.Manager
             {
                 UserId = user.UserId,
                 Username = user.Username,
-                Password = user.Password,
+                Password = string.Empty,
                 RoleId = user.RoleId
             };
             isEditDialogVisible = true;
@@ -69,13 +70,18 @@ namespace As.Zavrsni.Web.Components.Pages.Manager
                 if (user != null)
                 {
                     user.Username = currentUser.Username;
-                    user.Password = currentUser.Password;
                     user.RoleId = currentUser.RoleId;
+                    if (!string.IsNullOrWhiteSpace(currentUser.Password))
+                    {
+                        user.Password = BCrypt.Net.BCrypt.HashPassword(currentUser.Password);
+                    }
+                   
                     await DbContext.SaveChangesAsync();
                 }
             }
             else
             {
+                currentUser.Password = BCrypt.Net.BCrypt.HashPassword(currentUser.Password);
                 await DbContext.Users.AddAsync(currentUser);
                 await DbContext.SaveChangesAsync();
             }

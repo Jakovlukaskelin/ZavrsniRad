@@ -1,8 +1,47 @@
 ﻿@page "/Chef"
+@using As.Zavrsni.Aplication.Products.Model
+@using Syncfusion.Blazor.Notifications
+@using Syncfusion.Blazor.Popups
 
 
-<h3>Chef</h3>
+<div class="container mx-auto p-4">
+    <h1 class="text-2xl font-bold mb-4">Chef Dashboard</h1>
+    <SfGrid DataSource="@Products" AllowPaging="true" >
+        <GridColumns>
+            <GridColumn Field="ProductName" HeaderText="Naziv" Width="200"></GridColumn>
+            <GridColumn Field="ProductType" HeaderText="Vrsta" Width="150"></GridColumn>
+            <GridColumn Field="ExpiryDate" HeaderText="Datum" Width="150" Format="dd/MM/yyyy"></GridColumn>
+            <GridColumn Field="Quantity" HeaderText="Količina" Width="100"></GridColumn>
+        </GridColumns>
+    </SfGrid>
 
-@code {
+    <SfButton CssClass="e-primary mt-4" @onclick="OpenAddProductDialog">Dodaj proizvod</SfButton>
 
-}
+    <SfDialog @bind-Visible="IsAddProductDialogVisible" Width="400px" Header="Dodaj proizvod" ShowCloseIcon ="true">
+        <DialogTemplates>
+            <Content>
+                <div class="p-4">
+                    <div class="mb-4">
+                        <label class="block text-gray-700">Ime proizvoda</label>
+                        <input class="form-input mt-1 block w-full" @bind="NewProduct.ProductName" />
+                    </div>
+                  
+                    <div class="mb-4">
+                        <label class="block text-gray-700">Istek roka</label>
+                        <input type="date" class="form-input mt-1 block w-full" @bind="NewProduct.ExpiryDate" />
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700">Količina</label>
+                        <input type="number" class="form-input mt-1 block w-full" @bind="NewProduct.Quantity" />
+                    </div>
+                    <SfButton CssClass="e-primary" @onclick="AddProduct">Dodaj proizvod</SfButton>
+                </div>
+            </Content>
+        </DialogTemplates>
+    </SfDialog>
+
+ 
+</div>
+<SfToast @ref="ToastObj" Timeout="5000" Title="Low Stock Alert" Content="@toastMessage">
+    <ToastPosition X="Right" Y="Top"></ToastPosition>
+</SfToast>

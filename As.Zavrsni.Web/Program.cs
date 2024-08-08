@@ -13,6 +13,7 @@ using System.Reflection;
 using MediatR;
 using As.Zavrsni.Aplication.Products.Query;
 using As.Zavrsni.Aplication.Infrastructure;
+using As.Zavrsni.Aplication.Common;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,7 +23,7 @@ builder.Services.AddRazorComponents()
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-
+builder.Services.AddSignalR();
 builder.Services.AddDbContext<ZavrsniDbContext>(options =>
     options.UseSqlServer(connectionString));
 
@@ -56,7 +57,12 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseAntiforgery();
+app.UseEndpoints(endpoints =>
+{
 
+     endpoints.MapHub<OrderHub>("/orderHub");
+    
+});
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 

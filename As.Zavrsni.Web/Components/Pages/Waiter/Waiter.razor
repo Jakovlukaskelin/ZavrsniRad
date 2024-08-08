@@ -15,7 +15,7 @@
 </div>
 <div class="flex justify-center mb-4">
     <button class="py-2 px-4 bg-green-500 text-black rounded mx-2" @onclick='() => OnProductTypeChange("Hrana")'>Food</button>
-    <button class="py-2 px-4 bg-blue-500 text-black rounded mx-2" @onclick='() => OnProductTypeChange("Drinks")'>Drinks</button>
+    <button class="py-2 px-4 bg-blue-500 text-black rounded mx-2" @onclick='() => OnProductTypeChange("Pica")'>Drinks</button>
     <button class="py-2 px-4 bg-gray-500 text-black rounded mx-2" @onclick="() => OnProductTypeChange(null)">All</button>
 </div>
 
@@ -24,10 +24,10 @@
     <div class="flex-1">
         <SfGrid DataSource="@filteredProducts" AllowFiltering="true">
             <GridColumns>
-                <GridColumn Field="@nameof(ProductsModel.ProductName)" HeaderText="Product Name" Width="150"></GridColumn>
-                <GridColumn Field="@nameof(ProductsModel.ProductType)" HeaderText="Type" Width="150"></GridColumn>
-                <GridColumn Field="@nameof(ProductsModel.Quantity)" HeaderText="Quantity" Width="100"></GridColumn>
-                <GridColumn Field="@nameof(ProductsModel.ExpiryDate)" HeaderText="Expiry Date" Width="150"></GridColumn>
+                <GridColumn Field="@nameof(ProductsModel.ProductName)" HeaderText="Proizvod" Width="150"></GridColumn>
+                <GridColumn Field="@nameof(ProductsModel.ProductType)" HeaderText="Vrsta" Width="150"></GridColumn>
+                <GridColumn Field="@nameof(ProductsModel.Quantity)" HeaderText="Količina" Width="100"></GridColumn>
+                <GridColumn Field="@nameof(ProductsModel.ExpiryDate)" HeaderText="Rok trajanja" Format="dd/MM/yyyy" Width="150"></GridColumn>
                 <GridColumn HeaderText="Select" Width="100" TextAlign="TextAlign.Center">
                     <Template>
                         <button class="py-2 px-4 bg-blue-500 text-black rounded" @onclick="() => SelectProduct(context as ProductsModel)">Select</button>
@@ -45,8 +45,8 @@
                 <div>
                     <label class="block text-sm font-medium mb-2">Product Name: @selectedProduct.ProductName</label>
                     <label class="block text-sm font-medium mb-2">Quantity:</label>
-                    <SfNumericTextBox TValue="int" @bind-Value="orderQuantity" Min="1" Max="@selectedProduct.Quantity" Placeholder="Enter quantity"></SfNumericTextBox>
-                    <button class="mt-4 py-2 px-4 bg-blue-500 text-black rounded" @onclick="AddProductToOrder">Add to Order</button>
+                    <SfNumericTextBox TValue="int" @bind-Value="OrderQuantity" Min="1" Max="@selectedProduct.Quantity" Placeholder="Unesi količinu"></SfNumericTextBox>
+                    <button class="mt-4 py-2 px-4 bg-blue-500 text-black rounded" @onclick="AddProductToOrder">Dodaj narudžbu</button>
                 </div>
             }
             <h3 class="text-lg font-bold mt-4">Selected Products</h3>
@@ -55,11 +55,15 @@
                 {
                     <li class="flex justify-between mb-2">
                         <span>@item.ProductName - Quantity: @item.Quantity</span>
-                        <button class="ml-4 py-1 px-2 bg-red-500 text-black rounded" @onclick="() => RemoveProductFromOrder(item)">Remove</button>
+                        <button class="ml-4 py-1 px-2 bg-red-500 text-black rounded" @onclick="() => RemoveProductFromOrder(item)">Izbriši</button>
                     </li>
                 }
             </ul>
-            <button class="mt-4 py-2 px-4 bg-green-500 text-black rounded" @onclick="SubmitOrder">Submit Order</button>
+            <button class="mt-4 py-2 px-4 bg-green-500 text-black rounded" @onclick="SubmitOrder">Naruči</button>
+            @if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <div class="mt-2 text-red-500">@errorMessage</div>
+            }
         </div>
     </div>
 </div>
