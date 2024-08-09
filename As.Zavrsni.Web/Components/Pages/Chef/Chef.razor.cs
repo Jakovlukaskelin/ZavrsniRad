@@ -116,5 +116,9 @@ namespace As.Zavrsni.Web.Components.Pages.Chef
             _context.Products.Add(entity);
             await _context.SaveChangesAsync();
         }
+        private void Logout()
+        {
+            NavigationManager.NavigateTo("/");
+        }
     }
 }

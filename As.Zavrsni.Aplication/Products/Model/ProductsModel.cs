@@ -24,6 +24,14 @@ namespace As.Zavrsni.Aplication.Products.Model
         public void CreateMappings(Profile configuration)
         {
             configuration.CreateMap<Product, ProductsModel>();
+
+            configuration.CreateMap<Consumption, ProductsModel>()
+                .ForMember(dest => dest.ProductId, opt => opt.MapFrom(src => src.ProductId))
+                .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product.ProductName))
+                .ForMember(dest => dest.ProductType, opt => opt.MapFrom(src => src.Product.ProductType))
+                .ForMember(dest => dest.ExpiryDate, opt => opt.MapFrom(src => src.Product.ExpiryDate))
+                .ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.Quantity));
+               
         }
     }
 }

@@ -48,6 +48,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Abp" Version="9.3.0" />
     <PackageReference Include="Azure.Core" Version="1.41.0" />
     <PackageReference Include="Azure.Identity" Version="1.12.0" />
     <PackageReference Include="Azure.ResourceManager.Sql" Version="1.2.1" />
@@ -64,6 +65,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Syncfusion.Blazor.Buttons" Version="26.2.8" />
+    <PackageReference Include="Syncfusion.Blazor.Calendars" Version="26.2.8" />
     <PackageReference Include="Syncfusion.Blazor.Core" Version="26.2.8" />
     <PackageReference Include="Syncfusion.Blazor.Data" Version="26.2.8" />
     <PackageReference Include="Syncfusion.Blazor.DropDowns" Version="26.2.8" />

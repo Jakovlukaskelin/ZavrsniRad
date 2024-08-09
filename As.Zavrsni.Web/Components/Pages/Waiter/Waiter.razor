@@ -6,6 +6,7 @@
 @using Syncfusion.Blazor.Data
 @using Syncfusion.Blazor.Inputs
 @using Syncfusion.Blazor.Notifications
+@using Syncfusion.Blazor.Popups
 
 <div class="text-3xl font-bold mb-4 text-center">
     Dobrodošli
@@ -14,13 +15,14 @@
     <button class="py-2 px-4 text-black hover:bg-red-600  bg-red-300 rounded" @onclick="() => Logout()">Logout</button>
 </div>
 <div class="flex justify-center mb-4">
-    <button class="py-2 px-4 bg-green-500 text-black rounded mx-2" @onclick='() => OnProductTypeChange("Hrana")'>Food</button>
-    <button class="py-2 px-4 bg-blue-500 text-black rounded mx-2" @onclick='() => OnProductTypeChange("Pica")'>Drinks</button>
-    <button class="py-2 px-4 bg-gray-500 text-black rounded mx-2" @onclick="() => OnProductTypeChange(null)">All</button>
+    <button class="py-2 px-4 bg-green-500 text-black rounded mx-2" @onclick='() => OnProductTypeChange("Hrana")'>Hrana</button>
+    <button class="py-2 px-4 bg-blue-500 text-black rounded mx-2" @onclick='() => OnProductTypeChange("Pica")'>Pića</button>
+    <button class="py-2 px-4 bg-gray-500 text-black rounded mx-2" @onclick="() => OnProductTypeChange(null)">Sve</button>
 </div>
 
 
 <div class="flex">
+    
     <div class="flex-1">
         <SfGrid DataSource="@filteredProducts" AllowFiltering="true">
             <GridColumns>
@@ -30,7 +32,15 @@
                 <GridColumn Field="@nameof(ProductsModel.ExpiryDate)" HeaderText="Rok trajanja" Format="dd/MM/yyyy" Width="150"></GridColumn>
                 <GridColumn HeaderText="Select" Width="100" TextAlign="TextAlign.Center">
                     <Template>
-                        <button class="py-2 px-4 bg-blue-500 text-black rounded" @onclick="() => SelectProduct(context as ProductsModel)">Select</button>
+                        @{
+                            var product = context as ProductsModel;
+                            var hasDuplicates = Products.Where(x => x.Quantity > 0).Count(p => p.ProductName == product.ProductName) > 1;
+                        }
+                        @if (hasDuplicates)
+                        {
+                            <SfButton CssClass="e-warning" Content="⚠️" @onclick="() => ShowWarningDialog(product.ProductName)" />
+                        }
+                        <button class="py-2 px-4 bg-blue-500 text-black rounded" @onclick="() => SelectProduct(product)">Select</button>
                     </Template>
                 </GridColumn>
             </GridColumns>
@@ -71,3 +81,16 @@
 <SfToast @ref="toast" Timeout="5000" Title="Low Stock Alert" Content="@toastMessage">
     <ToastPosition X="Right" Y="Top"></ToastPosition>
 </SfToast>
+
+  <SfDialog @bind-Visible="isWarningDialogVisible" Width="500px" Header="Duplicate Products" ShowCloseIcon="true">
+    <div>
+        <h4>Products with the same name:</h4>
+        <ul>
+            @foreach (var product in DuplicateProducts)
+            {
+                <li>@product.ProductName količina @product.Quantity  datum isteka roka je @product.ExpiryDate?.ToString("d")</li>
+            }
+        </ul>
+        <SfButton CssClass="e-primary" Content="Close" @onclick="CloseWarningDialog" />
+    </div>
+</SfDialog>

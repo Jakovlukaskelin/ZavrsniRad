@@ -33,15 +33,17 @@ namespace As.Zavrsni.Web.Components.Pages.Waiter
         public List<OrderItem> orderItems { get; set; } = new List<OrderItem>();
 
         private HubConnection hubConnection;
-
         private string errorMessage;
+        private List<ProductsModel> DuplicateProducts = new List<ProductsModel>();
+        private bool isWarningDialogVisible = false;
 
         protected override async Task OnInitializedAsync()
         {
-            
+          
             Products = await Mediator.Send(new GetProductListQuery());
            
             filteredProducts = Products;
+           
             hubConnection = new HubConnectionBuilder().WithUrl(NavigationManager.ToAbsoluteUri("/orderhub")).Build();
             hubConnection.On<string>("ReceiveOrderUpdate", (message) =>
             {
@@ -64,20 +66,34 @@ namespace As.Zavrsni.Web.Components.Pages.Waiter
             FilterProducts();
         }
 
-        private void FilterProducts()
+        private async void FilterProducts()
         {
             if (selectedProductType == "Hrana")
             {
-                filteredProducts = Products.Where(p => p.ProductType == "Hrana").OrderBy(x => x.ExpiryDate).ToList();
+                filteredProducts = Products
+           .Where(p => p.ProductType == "Hrana" && p.Quantity > 0)
+           .GroupBy(p => p.ProductName)
+           .Select(g =>
+           {
+               var orderedProducts = g.OrderBy(p => p.ExpiryDate).ToList();
+               return orderedProducts.First(); 
+           })
+           .OrderBy(x => x.ExpiryDate)
+           .ToList();
             }
             else if (selectedProductType == "Pica")
             {
-                filteredProducts = Products.Where(p => p.ProductType != "Hrana").ToList();
+                filteredProducts = Products
+                    .Where(p => p.ProductType == "Pica" && p.Quantity > 0)
+                    .ToList();
             }
             else
             {
-                filteredProducts = Products;
+                filteredProducts = Products
+                    .Where(p => p.Quantity > 0)
+                    .ToList();
             }
+
             StateHasChanged();
         }
 
@@ -182,6 +198,7 @@ namespace As.Zavrsni.Web.Components.Pages.Waiter
                 await _context.SaveChangesAsync();
                 await LoadProducts();
                 StateHasChanged();
+               
                 if (allHrana)
                 {
                     await hubConnection.SendAsync("SendOrderUpdate", $"New Hrana order submitted: {orderDetails}");
@@ -199,6 +216,7 @@ namespace As.Zavrsni.Web.Components.Pages.Waiter
         private async Task LoadProducts()
         {
             Products = await Mediator.Send(new GetProductListQuery());
+            
             FilterProducts();
             StateHasChanged();
         }
@@ -213,6 +231,21 @@ namespace As.Zavrsni.Web.Components.Pages.Waiter
         {
             NavigationManager.NavigateTo("/");
         }
+        private void ShowWarningDialog(string productName)
+        {
+
+            DuplicateProducts = Products
+                .Where(p => p.ProductName == productName)
+                .OrderBy(p => p.ExpiryDate)
+                .ToList();
+
+            isWarningDialogVisible = true;
+        }
+        private void CloseWarningDialog()
+        {
+            isWarningDialogVisible = false;
+        }
+        
     }
 
     public class OrderItem

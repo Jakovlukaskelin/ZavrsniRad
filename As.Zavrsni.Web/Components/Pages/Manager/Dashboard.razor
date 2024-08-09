@@ -1,33 +1,164 @@
-﻿@using As.Zavrsni.Web.Components.Helpers
-@using Syncfusion.Blazor.Buttons
+﻿@using As.Zavrsni.Aplication.Common.Enum
+@using As.Zavrsni.Aplication.StartAndEndDate
+@using As.Zavrsni.Web.Components.Helpers
+
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.DropDowns
 @using Syncfusion.Blazor.Navigations
+@using Syncfusion.Blazor.Buttons
+@using As.Zavrsni.Aplication.Products.Model
+@using Syncfusion.Blazor.Popups
 @implements IDisposable
 @inject NavigationManager NavigationManager
 
 @page "/dashboard"
 
+
+
 <h3>Dashboard</h3>
 
-<div class="w-60 h-screen bg-white border-r text-xs fixed top-0 left-0">
-    <div class="h-11 flex items-center px-5">
-        <button @onclick="Logout" class="flex items-center gap-2 text-info-400 font-semibold hover:text-info-600">
-            <span class="material-symbols-outlined !text-sm">Logout</span>
-        </button>
+<div class="flex">
+    <!-- Sidebar -->
+    <div class="w-60 h-screen bg-white border-r text-xs fixed top-0 left-0">
+        <div class="h-11 flex items-center px-5">
+            <SfButton CssClass="e-flat" Content="Logout" IconCss="e-icons e-logout" @onclick="Logout" />
+        </div>
+
+        <div class="px-3 py-3 text-neutral-400 font-semibold tracking-wide">ADMINISTRACIJA</div>
+        <div class="nav-items">
+            <nav class="flex-column">
+                <div class="w-full @(currentUrl == "dashboard" ? "active" : "")">
+                    <NavLink class="nav-item" href="/dashboard" Match="NavLinkMatch.All">
+                        <span class="material-symbols-outlined !text-lg">Dashboard</span>
+                    </NavLink>
+                </div>
+                <div class="w-full @(currentUrl == "users" ? "active" : "")">
+                    <NavLink class="nav-item" href="/users" Match="NavLinkMatch.All">
+                        <span class="material-symbols-outlined fill !text-lg">Korisnici</span>
+                    </NavLink>
+                </div>
+            </nav>
+        </div>
     </div>
 
-    <div class="px-3 py-3 text-neutral-400 font-semibold tracking-wide">ADMINISTRACIJA</div>
-    <div class="nav-items">
-        <nav class="flex-column">
-            <div class="w-full @(currentUrl == "dashboard" ? "active" : "")">
-                <NavLink class="nav-item" href="/dashboard" Match="NavLinkMatch.All">
-                    <span class="material-symbols-outlined !text-lg">Dashboard</span>
-                </NavLink>
+    <!-- Main Content -->
+    <div class="flex-1 ml-60 p-6">
+        <!-- Switch View Section -->
+        <div class="mb-4 flex space-x-4">
+            <SfButton CssClass="e-primary" Content="Proizvodi" @onclick='() => SwitchView("proizvode")' />
+            <SfButton CssClass="e-primary" Content="Potrošnja" @onclick='() => SwitchView("potrošnja")' />
+        </div>
+
+        @if (SelectedView == "potrošnja")
+        {
+            <div class="mb-4 flex space-x-4">
+                <!-- Date Range Pickers for Filtering -->
+                <input type="date" @bind="StartDate" class="form-control" />
+                <input type="date" @bind="EndDate" class="form-control" />
+                <SfButton CssClass="e-primary" Content="Pretraži" @onclick="() => FilterData()" />
+               
             </div>
-            <div class="w-full @(currentUrl == "users" ? "active" : "")">
-                <NavLink class="nav-item" href="/users" Match="NavLinkMatch.All">
-                    <span class="material-symbols-outlined fill !text-lg">Korisnici</span>
-                </NavLink>
-            </div>
-        </nav>
+        }
+
+        <!-- Grid Section -->
+        <SfGrid DataSource="@FilterProducts" AllowPaging="true" AllowFiltering="true">
+            <GridColumns>
+                <GridColumn Field=@nameof(ProductsModel.ProductName) HeaderText="Naziv" Width="100"></GridColumn>
+                <GridColumn Field=@nameof(ProductsModel.ProductType) HeaderText="Vrsta" Width="100"></GridColumn>
+                <GridColumn Field=@nameof(ProductsModel.ExpiryDate) HeaderText="Datum" Width="100"></GridColumn>
+                <GridColumn Field=@nameof(ProductsModel.Quantity) HeaderText="Količina" Width="100"></GridColumn>
+                <GridColumn HeaderText="Actions" Width="150">
+                    <Template>
+                        @{
+                            var product = context as ProductsModel;
+                            var hasDuplicates = FilterProducts.Count(p => p.ProductName == product.ProductName) > 1;
+                        }
+                        @if (hasDuplicates)
+                        {
+                            <SfButton CssClass="e-warning" Content="⚠️" @onclick="() => ShowWarningDialog(product.ProductName)" />
+                        }
+                        <SfButton CssClass="e-primary" Content="Uredi" @onclick="() => EditProduct(product)" />
+                        <SfButton CssClass="e-danger" Content="Izbriši" @onclick="() => DeleteProduct(product)" />
+                    </Template>
+                </GridColumn>
+            </GridColumns>
+        </SfGrid>
+
+        @if (SelectedView == "proizvode")
+        {
+            <SfButton CssClass="e-success" Content="Dodaj novi proizvod" @onclick="ShowAddProductForm" />
+
+            <SfDialog @bind-Visible="isAddingProduct" Width="500px" Header="Novi prozivod" ShowCloseIcon="true" Overlay="true">
+                <div class="dialog-description">
+                    <p>Molim ispunite formu za dodavanja novih proizvoda.</p>
+                </div>
+
+                <EditForm Model="@newProduct" OnValidSubmit="AddProductToDatabase">
+                    <div class="form-group">
+                        <label for="ProductName">Naziv</label>
+                        <InputText id="ProductName" class="form-control" @bind-Value="newProduct.ProductName" placeholder="Upiši naziv prozivda" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ProductType">Vrsta</label>
+                        <InputText id="ProductType" class="form-control" @bind-Value="newProduct.ProductType" placeholder="Upiši vrstu proizvoda" />
+                    </div>
+
+                    @if (newProduct.ProductType == "Hrana")
+                    {
+                        <div class="form-group conditional-field">
+                            <label for="ExpiryDate">Datum</label>
+                            <InputDate id="ExpiryDate" class="form-control" @bind-Value="newProduct.ExpiryDate" />
+                        </div>
+                    }
+
+                    <div class="form-group">
+                        <label for="Quantity">Količina</label>
+                        <InputNumber id="Quantity" class="form-control" @bind-Value="newProduct.Quantity" placeholder="Unesi količinu" />
+                    </div>
+
+                    <div class="form-actions">
+                        <SfButton CssClass="e-primary" Content="Spremi" Type="Submit" />
+                        <SfButton CssClass="e-secondary" Content="Odustani" @onclick="CancelAddProduct" />
+                    </div>
+                </EditForm>
+            </SfDialog>
+        }
     </div>
 </div>
+<!-- Edit Product Modal -->
+<SfDialog @bind-Visible="isEditingProduct" Width="500px" Header="Uredi proizvod" ShowCloseIcon="true" Overlay="true">
+    <EditForm Model="@selectedProduct" OnValidSubmit="UpdateProductInDatabase">
+        <div class="form-group">
+            <label for="ProductName">Naziv</label>
+            <InputText id="ProductName" class="form-control" @bind-Value="selectedProduct.ProductName" />
+        </div>
+        <div class="form-group">
+            <label for="ProductType">Vrsta</label>
+            <InputText id="ProductType" class="form-control" @bind-Value="selectedProduct.ProductType" />
+        </div>
+        <div class="form-group">
+            <label for="ExpiryDate">Datum</label>
+            <InputDate id="ExpiryDate" class="form-control" @bind-Value="selectedProduct.ExpiryDate" />
+        </div>
+        <div class="form-group">
+            <label for="Quantity">Količina</label>
+            <InputNumber id="Quantity" class="form-control" @bind-Value="selectedProduct.Quantity" />
+        </div>
+        <SfButton CssClass="e-primary" Content="Spremi" Type="Submit" />
+        <SfButton CssClass="e-secondary" Content="Odustani" @onclick="CancelEditProduct" />
+    </EditForm>
+</SfDialog>
+
+<SfDialog @bind-Visible="isWarningDialogVisible" Width="500px" Header="Duplicate Products" ShowCloseIcon="true">
+    <div>
+        <h4>Products with the same name:</h4>
+        <ul>
+            @foreach (var product in duplicateProducts)
+            {
+                <li>@product.ProductName ima još @product.Quantity datum isteka roka je @product.ExpiryDate?.ToString("d")</li>
+            }
+        </ul>
+        <SfButton CssClass="e-primary" Content="Close" @onclick="CloseWarningDialog" />
+    </div>
+</SfDialog>

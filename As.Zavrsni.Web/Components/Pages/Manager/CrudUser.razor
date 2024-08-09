@@ -34,14 +34,14 @@
 
     <div class="flex-1 ml-60 p-6 bg-gray-50">
         <div class="container mx-auto shadow-lg p-6 bg-white rounded-lg">
-            <SfButton CssClass="e-primary" @onclick="OpenAddUserDialog">Add New User</SfButton>
+            <SfButton CssClass="e-primary" @onclick="OpenAddUserDialog">Dodaj novo osoblje</SfButton>
 
             <SfGrid @ref="Grid" DataSource="@Users" AllowPaging="true" AllowSorting="true" Toolbar="@(new List<string> { "Search" })">
                 <GridColumns>
                     <GridColumn Field="UserId" HeaderText="ID" IsPrimaryKey="true" TextAlign="TextAlign.Center" Width="120"></GridColumn>
-                    <GridColumn Field="Username" HeaderText="Username" Width="150"></GridColumn>
-                    <GridColumn Field="Password" HeaderText="Password" Width="200"></GridColumn>
-                    <GridColumn Field="RoleId" HeaderText="Role ID" Width="150"></GridColumn>
+                    <GridColumn Field="Username" HeaderText="Korisničko ime" Width="150"></GridColumn>
+                    <GridColumn Field="Password" HeaderText="Lozinka" Width="200"></GridColumn>
+                    <GridColumn Field="RoleId" HeaderText="Rola" Width="150"></GridColumn>
                     <GridColumn HeaderText="Actions" Width="150">
                         <Template>
                             @{
@@ -67,15 +67,15 @@
                 <EditForm Model="@currentUser" OnValidSubmit="@SaveUser">
                     <DataAnnotationsValidator />
                     <div class="form-group mb-4">
-                        <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
+                        <label for="username" class="block text-sm font-medium text-gray-700">Korisničko ime</label>
                         <SfTextBox Id="username" @bind-Value="currentUser.Username" CssClass="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-info-500 focus:border-info-500 sm:text-sm" />
                     </div>
                     <div class="form-group mb-4">
-                        <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                        <label for="password" class="block text-sm font-medium text-gray-700">Lozinka</label>
                         <SfTextBox Id="password" @bind-Value="currentUser.Password" CssClass="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-info-500 focus:border-info-500 sm:text-sm" />
                     </div>
                     <div class="form-group mb-4">
-                        <label for="role" class="block text-sm font-medium text-gray-700">Role</label>
+                        <label for="role" class="block text-sm font-medium text-gray-700">Rola</label>
                         <SfDropDownList Id="role" @bind-Value="currentUser.RoleId" DataSource="@(new List<object> { new { Id = 1, Name = "Konobar" }, new { Id = 3, Name = "Kuhar" } })" TItem="object" TValue="int?" Placeholder="Select Role" CssClass="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-info-500 focus:border-info-500 sm:text-sm">
                             <DropDownListFieldSettings Value="Id" Text="Name" />
                         </SfDropDownList>
@@ -102,15 +102,15 @@
                 <EditForm Model="@currentUser" OnValidSubmit="@SaveUser">
                     <DataAnnotationsValidator />
                     <div class="form-group mb-4">
-                        <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
+                        <label for="username" class="block text-sm font-medium text-gray-700">Korisničko ime</label>
                         <SfTextBox Id="username" @bind-Value="currentUser.Username" CssClass="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-info-500 focus:border-info-500 sm:text-sm" />
                     </div>
                     <div class="form-group mb-4">
-                        <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                        <label for="password" class="block text-sm font-medium text-gray-700">Lozinka</label>
                         <SfTextBox Id="password" @bind-Value="currentUser.Password" CssClass="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-info-500 focus:border-info-500 sm:text-sm" />
                     </div>
                     <div class="form-group mb-4">
-                        <label for="role" class="block text-sm font-medium text-gray-700">Role</label>
+                        <label for="role" class="block text-sm font-medium text-gray-700">Rola</label>
                         <SfDropDownList Id="role" @bind-Value="currentUser.RoleId" DataSource="@(new List<object> { new { Id = 1, Name = "Konobar" }, new { Id = 3, Name = "Kuhar" } })" TItem="object" TValue="int?" Placeholder="Select Role" CssClass="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-info-500 focus:border-info-500 sm:text-sm">
                             <DropDownListFieldSettings Value="Id" Text="Name" />
                         </SfDropDownList>
