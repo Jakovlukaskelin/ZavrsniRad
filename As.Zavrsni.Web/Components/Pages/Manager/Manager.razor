@@ -8,7 +8,7 @@
 <div class="w-60 h-screen bg-white border-r text-xs fixed top-0 left-0">
     <div class="h-11 flex items-center px-5">
         <button @onclick="Logout" class="flex items-center gap-2 text-info-400 font-semibold hover:text-info-600">
-            <span class="material-symbols-outlined !text-sm">Logout</span>
+            <span class="material-symbols-outlined !text-sm">Odjavi</span>
         </button>
     </div>
 
@@ -23,6 +23,11 @@
             <div class="w-full @(currentUrl == "users" ? "active" : "")">
                 <NavLink class="nav-item" href="/users" Match="NavLinkMatch.All">
                     <span class="material-symbols-outlined fill !text-lg">Korisnici</span>
+                </NavLink>
+            </div>
+            <div class="w-full @(currentUrl == "notificationadminwaiter" ? "active" : "")">
+                <NavLink class="nav-item" href="/notificationadminwaiter" Match="NavLinkMatch.All">
+                    <span class="material-symbols-outlined fill !text-lg">Notifikacije</span>
                 </NavLink>
             </div>
         </nav>

@@ -1,50 +1,93 @@
 ﻿@page "/Chef"
+
 @using As.Zavrsni.Aplication.Products.Model
 @using Syncfusion.Blazor.Notifications
 @using Syncfusion.Blazor.Popups
 
 <div>
-    <button class="py-2 px-4 text-black hover:bg-red-600  bg-red-300 rounded" @onclick="() => Logout()">Logout</button>
+    <button class="py-2 px-4 text-white hover:bg-red-700 bg-red-500 rounded" @onclick="() => Logout()">Logout</button>
 </div>
 
 <div class="container mx-auto p-4">
-    <h1 class="text-2xl font-bold mb-4">Chef Dashboard</h1>
-    <SfGrid DataSource="@Products" AllowPaging="true" >
-        <GridColumns>
-            <GridColumn Field="ProductName" HeaderText="Naziv" Width="200"></GridColumn>
-            <GridColumn Field="ProductType" HeaderText="Vrsta" Width="150"></GridColumn>
-            <GridColumn Field="ExpiryDate" HeaderText="Datum" Width="150" Format="dd/MM/yyyy"></GridColumn>
-            <GridColumn Field="Quantity" HeaderText="Količina" Width="100"></GridColumn>
-        </GridColumns>
-    </SfGrid>
+    <h1 class="text-3xl font-bold mb-6">Chef Dashboard</h1>
 
-    <SfButton CssClass="e-primary mt-4" @onclick="OpenAddProductDialog">Dodaj proizvod</SfButton>
-
-    <SfDialog @bind-Visible="IsAddProductDialogVisible" Width="400px" Header="Dodaj proizvod" ShowCloseIcon ="true">
-        <DialogTemplates>
-            <Content>
-                <div class="p-4">
-                    <div class="mb-4">
-                        <label class="block text-gray-700">Ime proizvoda</label>
-                        <input class="form-input mt-1 block w-full" @bind="NewProduct.ProductName" />
-                    </div>
-                  
-                    <div class="mb-4">
-                        <label class="block text-gray-700">Istek roka</label>
-                        <input type="date" class="form-input mt-1 block w-full" @bind="NewProduct.ExpiryDate" />
-                    </div>
-                    <div class="mb-4">
-                        <label class="block text-gray-700">Količina</label>
-                        <input type="number" class="form-input mt-1 block w-full" @bind="NewProduct.Quantity" />
-                    </div>
-                    <SfButton CssClass="e-primary" @onclick="AddProduct">Dodaj proizvod</SfButton>
-                </div>
-            </Content>
-        </DialogTemplates>
-    </SfDialog>
-
- 
+    <div class="relative inline-block">
+        <button class="relative bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full" @onclick="NavigateToNotificationsPage">
+            Notifikacije
+            @if (UnreadNotificationsCount > 0)
+            {
+                <span class="absolute top-0 right-0 -mt-2 -mr-2 inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-red-600 rounded-full">
+                    @UnreadNotificationsCount
+                </span>
+            }
+        </button>
+    </div>
 </div>
-<SfToast @ref="ToastObj" Timeout="5000" Title="Low Stock Alert" Content="@toastMessage">
+
+<SfGrid DataSource="@Products" AllowPaging="true">
+    <GridColumns>
+        <GridColumn Field="ProductName" HeaderText="Naziv" Width="200"></GridColumn>
+        <GridColumn Field="ProductType" HeaderText="Vrsta" Width="150"></GridColumn>
+        <GridColumn Field="ExpiryDate" HeaderText="Datum" Width="150" Format="dd/MM/yyyy"></GridColumn>
+        <GridColumn Field="Quantity" HeaderText="Količina" Width="100"></GridColumn>
+         <GridColumn HeaderText="Akcije" Width="100">
+            <Template>
+                @{
+                    var product = context as ProductsModel;
+                }
+                <SfButton CssClass="e-flat e-primary" @onclick="() => EditProduct(product)">Uredi</SfButton>
+            </Template>
+        </GridColumn>
+    </GridColumns>
+</SfGrid>
+
+<SfButton CssClass="e-primary mt-6" @onclick="OpenAddProductDialog">Dodaj proizvod</SfButton>
+
+<SfDialog @bind-Visible="IsAddProductDialogVisible" Width="400px" Header="Dodaj proizvod" ShowCloseIcon="true">
+    <DialogTemplates>
+        <Content>
+            <div class="p-6">
+                <div class="mb-4">
+                    <label class="block text-gray-700">Ime proizvoda</label>
+                    <input class="form-input mt-1 block w-full border-gray-300 rounded" @bind="NewProduct.ProductName" />
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-gray-700">Istek roka</label>
+                    <input type="date" class="form-input mt-1 block w-full border-gray-300 rounded" @bind="NewProduct.ExpiryDate" />
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700">Količina</label>
+                    <input type="number" class="form-input mt-1 block w-full border-gray-300 rounded" @bind="NewProduct.Quantity" />
+                </div>
+                <SfButton CssClass="e-primary" @onclick="AddProduct">Dodaj proizvod</SfButton>
+            </div>
+        </Content>
+    </DialogTemplates>
+</SfDialog>
+<SfDialog @bind-Visible="IsEditProductDialogVisible" Width="400px" Header="Uredi proizvod" ShowCloseIcon="true">
+    <DialogTemplates>
+        <Content>
+            <div class="p-6">
+                <div class="mb-4">
+                    <label class="block text-gray-700">Ime proizvoda</label>
+                    <input class="form-input mt-1 block w-full border-gray-300 rounded" @bind="EditProductModel.ProductName" />
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-gray-700">Istek roka</label>
+                    <input type="date" class="form-input mt-1 block w-full border-gray-300 rounded" @bind="EditProductModel.ExpiryDate" />
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700">Količina</label>
+                    <input type="number" class="form-input mt-1 block w-full border-gray-300 rounded" @bind="EditProductModel.Quantity" />
+                </div>
+                <SfButton CssClass="e-primary" @onclick="SaveProductChanges">Spremi promjene</SfButton>
+            </div>
+        </Content>
+    </DialogTemplates>
+</SfDialog>
+
+<SfToast @ref="ToastObj" Timeout="5000" Title="Order Update" Content="@toastMessage">
     <ToastPosition X="Right" Y="Top"></ToastPosition>
 </SfToast>

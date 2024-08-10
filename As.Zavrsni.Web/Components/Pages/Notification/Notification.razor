@@ -1,0 +1,32 @@
+﻿
+@page "/notifications"
+
+<h1 class="text-3xl font-bold text-gray-800 mb-6">Product Notifications</h1>
+
+
+@if (notifications != null && notifications.Any())
+{
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        @foreach (var notification in notifications.Where(x => x.ProductType == "Hrana"))
+        {
+            <div class="bg-white p-6 rounded-lg shadow-lg border-l-4 @GetBorderColor(notification)">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold text-gray-700">@notification.ProductName</h2>
+                    <input type="checkbox" @onchange="(e) => MarkAsAddressed(notification.NotificationId, (bool)e.Value)" />
+                </div>
+                <p class="text-sm text-gray-600 mb-2">@notification.Message</p>
+                <p class="text-sm text-gray-500 mb-4">
+                    <strong>Type:</strong> @notification.ProductType |
+                    <strong>Quantity:</strong> <span class="font-bold text-red-600">@notification.Quantity</span> |
+                    <strong>Expiry Date:</strong> <span class="font-bold text-red-600">@notification.ExpiryDate?.ToString("dd/MM/yyyy")</span>
+                </p>
+                <p class="text-xs text-gray-400">Notification received on: @notification.NotificationDate?.ToString("dd/MM/yyyy")</p>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <p class="text-lg text-gray-600">No notifications at the moment.</p>
+}
+

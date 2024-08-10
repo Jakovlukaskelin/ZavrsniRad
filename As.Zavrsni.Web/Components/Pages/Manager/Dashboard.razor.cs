@@ -33,13 +33,12 @@ namespace As.Zavrsni.Web.Components.Pages.Manager
         public List<ProductsModel> Products { get; set; } = new List<ProductsModel>();
         public List<ConsumptionModel> Consumption { get; set; } = new List<ConsumptionModel>();
         public List<ProductsModel> FilterProducts { get; set; } = new List<ProductsModel>();
-        public string SelectedView { get; set; } = "products";
+        public string SelectedView { get; set; } = "proizvode";
 
         private ProductsModel newProduct = new ProductsModel();
 
         private bool isAddingProduct = false;
-        private SfToast SfToast { get; set; }
-        private string toastMessage;
+      
         public DateTime StartDate { get; set; } = DateTime.Today;
         public DateTime EndDate { get; set; } = DateTime.Today;
 
@@ -81,7 +80,7 @@ namespace As.Zavrsni.Web.Components.Pages.Manager
         private void FilterData()
         {
 
-            if (SelectedView == "consumption")
+            if (SelectedView == "potrošnja")
             {
                 DateOnly startDate = DateOnly.FromDateTime(StartDate);
                 DateOnly endDate = DateOnly.FromDateTime(EndDate);
@@ -95,7 +94,7 @@ namespace As.Zavrsni.Web.Components.Pages.Manager
                         .Select(group => new ProductsModel
                         {
                             ProductName = group.Key.ProductName,
-                            ProductType = "consumption",
+                            ProductType = "potrošnja",
                             ExpiryDate = group.Key.ConsumptionDate,
                             Quantity = group.Sum(c => c.Quantity)
                         })
@@ -112,7 +111,7 @@ namespace As.Zavrsni.Web.Components.Pages.Manager
                         .Select(group => new ProductsModel
                         {
                             ProductName = group.Key.ProductName,
-                            ProductType = "consumption",
+                            ProductType = "potrošnja",
                             ExpiryDate = group.Key.ConsumptionDate,
                             Quantity = group.Sum(c => c.Quantity)
                         })

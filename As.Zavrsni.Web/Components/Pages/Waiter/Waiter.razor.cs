@@ -1,7 +1,10 @@
 ﻿using As.Zavrsni.Aplication.Interface;
+using As.Zavrsni.Aplication.Notifikacije.Model;
+using As.Zavrsni.Aplication.Notifikacije.Query;
 using As.Zavrsni.Aplication.Products.Model;
 using As.Zavrsni.Aplication.Products.Query;
 using As.Zavrsni.Domain.Entites;
+using As.Zavrsni.Web.Components.Pages.Notification;
 using MediatR;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -27,6 +30,8 @@ namespace As.Zavrsni.Web.Components.Pages.Waiter
         public List<ProductsModel> filteredProducts { get; set; } = new List<ProductsModel>();
          public string selectedProductType { get; set; }
         public ProductsModel selectedProduct { get; set; }
+        public List<NotificationModel> Notifications { get; set; } = new List<NotificationModel>();
+        private int UnreadNotificationsCount => Notifications.Count(n => !n.Status);
         public int OrderQuantity { get; set; } = 1;
         private SfToast toast;
         private string toastMessage;
@@ -43,7 +48,8 @@ namespace As.Zavrsni.Web.Components.Pages.Waiter
             Products = await Mediator.Send(new GetProductListQuery());
            
             filteredProducts = Products;
-           
+            Notifications = await Mediator.Send(new GetNotificationQuery());
+            await CheckLowStockProducts();
             hubConnection = new HubConnectionBuilder().WithUrl(NavigationManager.ToAbsoluteUri("/orderhub")).Build();
             hubConnection.On<string>("ReceiveOrderUpdate", (message) =>
             {
@@ -245,7 +251,82 @@ namespace As.Zavrsni.Web.Components.Pages.Waiter
         {
             isWarningDialogVisible = false;
         }
-        
+        private void NavigateToNotificationsPage()
+        {
+            NavigationManager.NavigateTo("/notificationadminwaiter");
+        }
+        private async Task CheckLowStockProducts()
+        {
+            var lowStockProducts = Products.Where(p => p.Quantity <= 10).ToList();
+
+            foreach (var product in lowStockProducts)
+            {
+                string message = $"Low stock: {product.ProductName} only has {product.Quantity} items left.";
+
+                if (!await NotificationExists(product.ProductId, message))
+                {
+                    var notification = new NotificationModel
+                    {
+                        ProductId = product.ProductId,
+                        ProductName = product.ProductName,
+                        ProductType = product.ProductType,
+                        Quantity = product.Quantity,
+                        Message = message,
+                        NotificationDate = DateTime.Now
+                    };
+
+                    Notifications.Add(notification);
+                    await AddNotificationToDatabase(notification);
+                }
+            }
+
+            if (Notifications.Any())
+            {
+                ShowNotificationToast("You have new notifications.");
+            }
+        }
+
+        private async Task<bool> NotificationExists(int productId, string message)
+        {
+            int retryCount = 3;
+            while (retryCount > 0)
+            {
+                try
+                {
+                    return await _context.Notifications
+                                         .AsNoTracking()
+                                         .AnyAsync(n => n.ProductId == productId && n.Message == message && n.Status == "false");
+                }
+                catch (InvalidOperationException)
+                {
+                    retryCount--;
+                    if (retryCount == 0) throw;
+                    await Task.Delay(1000);
+                }
+            }
+
+            return false;
+        }
+
+        private async Task AddNotificationToDatabase(NotificationModel notification)
+        {
+            var entity = new Domain.Entites.Notification
+            {
+                ProductId = notification.ProductId,
+                NotificationDate = notification.NotificationDate,
+                Message = notification.Message,
+                Status = "false"
+            };
+
+            _context.Notifications.Add(entity);
+            await _context.SaveChangesAsync();
+        }
+
+        private void ShowNotificationToast(string message)
+        {
+            toastMessage = message;
+            toast.ShowAsync(new ToastModel { Title = "Notification", Content = toastMessage });
+        }
     }
 
     public class OrderItem

@@ -15,19 +15,28 @@
     <div class="w-60 h-screen bg-white border-r text-xs fixed top-0 left-0 shadow-md">
         <div class="h-11 flex items-center px-5 border-b">
             <button @onclick="Logout" class="flex items-center gap-2 text-info-400 font-semibold hover:text-info-600">
-                <span class="material-symbols-outlined !text-sm">Logout</span>
+                <span class="material-symbols-outlined !text-sm">Odjavi</span>
             </button>
         </div>
 
         <div class="px-3 py-3 text-neutral-400 font-semibold tracking-wide">ADMINISTRACIJA</div>
         <div class="nav-items">
-            <nav class="flex flex-col">
-                <NavLink class="nav-item flex items-center px-5 py-3 hover:bg-gray-100 transition-colors duration-200" href="/dashboard" Match="NavLinkMatch.All">
-                    <span class="material-symbols-outlined !text-lg">Dashboard</span>
-                </NavLink>
-                <NavLink class="nav-item flex items-center px-5 py-3 hover:bg-gray-100 transition-colors duration-200" href="/users" Match="NavLinkMatch.All">
-                    <span class="material-symbols-outlined !text-lg">Korisnici</span>
-                </NavLink>
+            <nav class="flex-column">
+                <div class="w-full @(currentUrl == "dashboard" ? "active" : "")">
+                    <NavLink class="nav-item" href="/dashboard" Match="NavLinkMatch.All">
+                        <span class="material-symbols-outlined !text-lg">Dashboard</span>
+                    </NavLink>
+                </div>
+                <div class="w-full @(currentUrl == "users" ? "active" : "")">
+                    <NavLink class="nav-item" href="/users" Match="NavLinkMatch.All">
+                        <span class="material-symbols-outlined fill !text-lg">Korisnici</span>
+                    </NavLink>
+                </div>
+                <div class="w-full @(currentUrl == "notificationadminwaiter" ? "active" : "")">
+                    <NavLink class="nav-item" href="/notificationadminwaiter" Match="NavLinkMatch.All">
+                        <span class="material-symbols-outlined fill !text-lg">Notifikacije</span>
+                    </NavLink>
+                </div>
             </nav>
         </div>
     </div>

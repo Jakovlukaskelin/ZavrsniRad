@@ -19,6 +19,8 @@ namespace As.Zavrsni.Aplication.Consumtpion.Model
 
         public string ProductName { get; set; }
 
+        public string ProductType { get; set; }
+
         public DateOnly? ConsumptionDate { get; set; }
 
         public int Quantity { get; set; }
@@ -28,12 +30,14 @@ namespace As.Zavrsni.Aplication.Consumtpion.Model
         public void CreateMappings(Profile configuration)
         {
             configuration.CreateMap<Consumption, ConsumptionModel>()
-                .ForMember(dest => dest.ProductName, opt => opt.MapFrom( src => src.Product.ProductName));
+                .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product.ProductName))
+                .ForMember(dest => dest.ProductType, opt => opt.MapFrom(src => src.Product.ProductType));
 
             configuration.CreateMap<Product, ConsumptionModel>()
                 .ForMember(dest => dest.ProductId, opt => opt.MapFrom(src => src.ProductId))
                 .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.ProductName))
                 .ForMember(dest => dest.ConsumptionDate, opt => opt.MapFrom(src => src.ExpiryDate))
+                .ForMember(dest => dest.ProductType, opt => opt.MapFrom(src => src.ProductType))
                 .ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.Quantity));
 
             

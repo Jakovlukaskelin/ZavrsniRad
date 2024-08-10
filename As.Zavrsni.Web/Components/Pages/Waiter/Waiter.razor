@@ -18,6 +18,15 @@
     <button class="py-2 px-4 bg-green-500 text-black rounded mx-2" @onclick='() => OnProductTypeChange("Hrana")'>Hrana</button>
     <button class="py-2 px-4 bg-blue-500 text-black rounded mx-2" @onclick='() => OnProductTypeChange("Pica")'>Pića</button>
     <button class="py-2 px-4 bg-gray-500 text-black rounded mx-2" @onclick="() => OnProductTypeChange(null)">Sve</button>
+    <button class="relative bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full" @onclick="NavigateToNotificationsPage">
+        Notifikacije
+        @if (UnreadNotificationsCount > 0)
+        {
+            <span class="absolute top-0 right-0 -mt-2 -mr-2 inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-red-600 rounded-full">
+                @UnreadNotificationsCount
+            </span>
+        }
+    </button>
 </div>
 
 
@@ -82,9 +91,9 @@
     <ToastPosition X="Right" Y="Top"></ToastPosition>
 </SfToast>
 
-  <SfDialog @bind-Visible="isWarningDialogVisible" Width="500px" Header="Duplicate Products" ShowCloseIcon="true">
+  <SfDialog @bind-Visible="isWarningDialogVisible" Width="500px" Header="Proizvodi" ShowCloseIcon="true">
     <div>
-        <h4>Products with the same name:</h4>
+        <h4>Proizvodi:</h4>
         <ul>
             @foreach (var product in DuplicateProducts)
             {

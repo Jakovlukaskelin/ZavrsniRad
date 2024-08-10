@@ -1,0 +1,62 @@
+﻿@page "/notificationadminwaiter"
+
+
+<h1 class="text-3xl font-bold text-gray-800 mb-6">Notifikacije za proizvode</h1>
+
+<div>
+    <h2 class="text-2xl font-bold text-gray-700 mb-4">Hrana</h2>
+    @if (notifications != null && notifications.Any())
+    {
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+            @foreach (var notification in notifications.Where(n => n.ProductType == "Hrana"))
+            {
+                <div class="bg-white p-6 rounded-lg shadow-lg border-l-4 @GetBorderColor(notification)">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-semibold text-gray-700">@notification.ProductName</h2>
+                        <input type="checkbox" @onchange="(e) => MarkAsAddressed(notification.NotificationId, (bool)e.Value)" />
+                    </div>
+                    <p class="text-sm text-gray-600 mb-2">@notification.Message</p>
+                    <p class="text-sm text-gray-500 mb-4">
+                        <strong>Vrsta:</strong> @notification.ProductType |
+                        <strong>Količina:</strong> <span class="font-bold text-red-600">@notification.Quantity</span> |
+                        <strong>Datum roka:</strong> <span class="font-bold text-red-600">@notification.ExpiryDate?.ToString("dd/MM/yyyy")</span>
+                    </p>
+                    <p class="text-xs text-gray-400">Notifikacija poslana: @notification.NotificationDate?.ToString("dd/MM/yyyy")</p>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p class="text-lg text-gray-600 mb-4">Nema notifikacije trenutno za hranu.</p>
+    }
+
+    <h2 class="text-2xl font-bold text-gray-700 mb-4">Pića</h2>
+    @if (notifications != null && notifications.Any())
+    {
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            @foreach (var notification in notifications.Where(n => n.ProductType != "Hrana"))
+            {
+                <div class="bg-white p-6 rounded-lg shadow-lg border-l-4 @GetBorderColor(notification)">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-semibold text-gray-700">@notification.ProductName</h2>
+                        <input type="checkbox" @onchange="(e) => MarkAsAddressed(notification.NotificationId, (bool)e.Value)" />
+                    </div>
+                    <p class="text-sm text-gray-600 mb-2">@notification.Message</p>
+                    <p class="text-sm text-gray-500 mb-4">
+                        <strong>Vrsta:</strong> @notification.ProductType |
+                        <strong>Količina:</strong> <span class="font-bold text-red-600">@notification.Quantity</span> |
+                        <strong>Datum roka:</strong> <span class="font-bold text-red-600">@notification.ExpiryDate?.ToString("dd/MM/yyyy")</span>
+                    </p>
+                    <p class="text-xs text-gray-400">Notification received on: @notification.NotificationDate?.ToString("dd/MM/yyyy")</p>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p class="text-lg text-gray-600">Nema notifikacije trenutno za piće.</p>
+    }
+</div>
+
+
