@@ -1,15 +1,21 @@
 ﻿@page "/Chef"
 
 @using As.Zavrsni.Aplication.Products.Model
+@using As.Zavrsni.Aplication.Services
 @using Syncfusion.Blazor.Notifications
 @using Syncfusion.Blazor.Popups
-
+@inject UserService UserService
 <div>
     <button class="py-2 px-4 text-white hover:bg-red-700 bg-red-500 rounded" @onclick="() => Logout()">Logout</button>
 </div>
 
 <div class="container mx-auto p-4">
-    <h1 class="text-3xl font-bold mb-6">Chef Dashboard</h1>
+    <h1 class="text-3xl font-bold mb-6">
+        @if (!string.IsNullOrEmpty(UserService.LoggedInUsername))
+        {
+            <span>Dobrodošli @UserService.LoggedInUsername</span>
+        }
+    </h1>
 
     <div class="relative inline-block">
         <button class="relative bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full" @onclick="NavigateToNotificationsPage">
@@ -22,7 +28,15 @@
             }
         </button>
     </div>
-</div>
+    <div class="relative inline-block">
+        <button class="relative bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full" @onclick="NavigateToNotificationsPage">
+            Narudžbe
+          
+        </button>
+    </div>
+</div> 
+
+
 
 <SfGrid DataSource="@Products" AllowPaging="true">
     <GridColumns>

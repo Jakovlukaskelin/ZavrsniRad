@@ -64,7 +64,7 @@
                 <SfButton CssClass="e-primary" Content="Pretraži" @onclick="() => FilterData()" />
                
             </div>
-        }
+        
 
         
         <SfGrid DataSource="@FilterProducts" AllowPaging="true" AllowFiltering="true">
@@ -73,51 +73,63 @@
                 <GridColumn Field=@nameof(ProductsModel.ProductType) HeaderText="Vrsta" Width="100"></GridColumn>
                 <GridColumn Field=@nameof(ProductsModel.ExpiryDate) HeaderText="Datum" Format="dd/MM/yyyy" Width="100"></GridColumn>
                 <GridColumn Field=@nameof(ProductsModel.Quantity) HeaderText="Količina" Width="100"></GridColumn>
-                <GridColumn HeaderText="Actions" Width="150">
-                    <Template>
-                        @{
-                            var product = context as ProductsModel;
-                          
-                        }
-                       
-                        <SfButton CssClass="e-primary" Content="Uredi" @onclick="() => EditProduct(product)" />
-                        <SfButton CssClass="e-danger" Content="Izbriši" @onclick="() => DeleteProduct(product)" />
-                    </Template>
-                </GridColumn>
-            </GridColumns>
-        </SfGrid>
+                </GridColumns>
+            </SfGrid>
+        }
+        else
+        {
+            <SfGrid DataSource="@FilterProducts" AllowPaging="true" AllowFiltering="true">
+                <GridColumns>
+                    <GridColumn Field=@nameof(ProductsModel.ProductName) HeaderText="Naziv" Width="100"></GridColumn>
+                    <GridColumn Field=@nameof(ProductsModel.ProductType) HeaderText="Vrsta" Width="100"></GridColumn>
+                    <GridColumn Field=@nameof(ProductsModel.ExpiryDate) HeaderText="Datum" Format="dd/MM/yyyy" Width="100"></GridColumn>
+                    <GridColumn Field=@nameof(ProductsModel.Quantity) HeaderText="Količina" Width="100"></GridColumn>
+                    <GridColumn HeaderText="Akcija" Width="150">
+                        <Template>
+                            @{
+                                var product = context as ProductsModel;
+
+                            }
+
+                            <SfButton CssClass="e-primary" Content="Uredi" @onclick="() => EditProduct(product)" />
+                            <SfButton CssClass="e-danger" Content="Izbriši" @onclick="() => DeleteProduct(product)" />
+                        </Template>
+                    </GridColumn>
+                </GridColumns>
+            </SfGrid>
+        }
 
         @if (SelectedView == "proizvode")
         {
             <SfButton CssClass="e-success" Content="Dodaj novi proizvod" @onclick="ShowAddProductForm" />
 
-            <SfDialog @bind-Visible="isAddingProduct" Width="500px" Header="Novi prozivod" ShowCloseIcon="true" Overlay="true">
+            <SfDialog @bind-Visible="IsAddingProduct" Width="500px" Header="Novi prozivod" ShowCloseIcon="true" Overlay="true">
                 <div class="dialog-description">
                     <p>Molim ispunite formu za dodavanja novih proizvoda.</p>
                 </div>
 
-                <EditForm Model="@newProduct" OnValidSubmit="AddProductToDatabase">
+                <EditForm Model="@NewProduct" OnValidSubmit="AddProductToDatabase">
                     <div class="form-group">
                         <label for="ProductName">Naziv</label>
-                        <InputText id="ProductName" class="form-control" @bind-Value="newProduct.ProductName" placeholder="Upiši naziv prozivda" />
+                        <InputText id="ProductName" class="form-control" @bind-Value="NewProduct.ProductName" placeholder="Upiši naziv prozivda" />
                     </div>
 
                     <div class="form-group">
                         <label for="ProductType">Vrsta</label>
-                        <InputText id="ProductType" class="form-control" @bind-Value="newProduct.ProductType" placeholder="Upiši vrstu proizvoda" />
+                        <InputText id="ProductType" class="form-control" @bind-Value="NewProduct.ProductType" placeholder="Upiši vrstu proizvoda" />
                     </div>
 
-                    @if (newProduct.ProductType == "Hrana")
+                    @if (NewProduct.ProductType == "Hrana")
                     {
                         <div class="form-group conditional-field">
                             <label for="ExpiryDate">Datum</label>
-                            <InputDate id="ExpiryDate" class="form-control" @bind-Value="newProduct.ExpiryDate" />
+                            <InputDate id="ExpiryDate" class="form-control" @bind-Value="NewProduct.ExpiryDate" />
                         </div>
                     }
 
                     <div class="form-group">
                         <label for="Quantity">Količina</label>
-                        <InputNumber id="Quantity" class="form-control" @bind-Value="newProduct.Quantity" placeholder="Unesi količinu" />
+                        <InputNumber id="Quantity" class="form-control" @bind-Value="NewProduct.Quantity" placeholder="Unesi količinu" />
                     </div>
 
                     <div class="form-actions">
@@ -130,23 +142,23 @@
     </div>
 </div>
  @* Edit Product Modal  *@
-<SfDialog @bind-Visible="isEditingProduct" Width="500px" Header="Uredi proizvod" ShowCloseIcon="true" Overlay="true">
-    <EditForm Model="@selectedProduct" OnValidSubmit="UpdateProductInDatabase">
+<SfDialog @bind-Visible="IsEditingProduct" Width="500px" Header="Uredi proizvod" ShowCloseIcon="true" Overlay="true">
+    <EditForm Model="@SelectedProduct" OnValidSubmit="UpdateProductInDatabase">
         <div class="form-group">
             <label for="ProductName">Naziv</label>
-            <InputText id="ProductName" class="form-control" @bind-Value="selectedProduct.ProductName" />
+            <InputText id="ProductName" class="form-control" @bind-Value="SelectedProduct.ProductName" />
         </div>
         <div class="form-group">
             <label for="ProductType">Vrsta</label>
-            <InputText id="ProductType" class="form-control" @bind-Value="selectedProduct.ProductType" />
+            <InputText id="ProductType" class="form-control" @bind-Value="SelectedProduct.ProductType" />
         </div>
         <div class="form-group">
             <label for="ExpiryDate">Datum</label>
-            <InputDate id="ExpiryDate" class="form-control" @bind-Value="selectedProduct.ExpiryDate" />
+            <InputDate id="ExpiryDate" class="form-control" @bind-Value="SelectedProduct.ExpiryDate" />
         </div>
         <div class="form-group">
             <label for="Quantity">Količina</label>
-            <InputNumber id="Quantity" class="form-control" @bind-Value="selectedProduct.Quantity" />
+            <InputNumber id="Quantity" class="form-control" @bind-Value="SelectedProduct.Quantity" />
         </div>
         <SfButton CssClass="e-primary" Content="Spremi" Type="Submit" />
         <SfButton CssClass="e-secondary" Content="Odustani" @onclick="CancelEditProduct" />

@@ -17,9 +17,9 @@ namespace As.Zavrsni.Web.Components.Pages.Manager
         private SfGrid<User> Grid;
         private List<User> Users = new List<User>();
         private User currentUser = new User();
-        private bool isAddDialogVisible = false;
-        private bool isEditDialogVisible = false;
-        private bool isEdit = false;
+        private bool IsAddDialogVisible = false;
+        private bool IsEditDialogVisible = false;
+        private bool IsEdit = false;
         private string? currentUrl;
         [Inject]
         private IZavrsniDbContext DbContext { get; set; }
@@ -44,27 +44,27 @@ namespace As.Zavrsni.Web.Components.Pages.Manager
 
         private void OpenAddUserDialog()
         {
-            isEdit = false;
+            IsEdit = false;
             currentUser = new User();
-            isAddDialogVisible = true;
+            IsAddDialogVisible = true;
         }
 
         private void OpenEditUserDialog(User user)
         {
-            isEdit = true;
+            IsEdit = true;
             currentUser = new User
             {
                 UserId = user.UserId,
                 Username = user.Username,
                 Password = string.Empty,
-                RoleId = user.RoleId
+                RoleId = user.Role.RoleName == "Admin" ? 1 : 2
             };
-            isEditDialogVisible = true;
+            IsEditDialogVisible = true;
         }
 
         private async Task SaveUser()
         {
-            if (isEdit)
+            if (IsEdit)
             {
                 var user = await DbContext.Users.FindAsync(currentUser.UserId);
                 if (user != null)
@@ -88,8 +88,8 @@ namespace As.Zavrsni.Web.Components.Pages.Manager
 
             await LoadUsers();
             await Grid.Refresh();
-            isAddDialogVisible = false;
-            isEditDialogVisible = false;
+            IsAddDialogVisible = false;
+            IsEditDialogVisible = false;
         }
 
         private async Task DeleteUser(User user)
@@ -103,17 +103,17 @@ namespace As.Zavrsni.Web.Components.Pages.Manager
 
             await LoadUsers();
             await Grid.Refresh();
-            isEditDialogVisible = false;
+            IsEditDialogVisible = false;
         }
 
         private void CloseAddDialog()
         {
-            isAddDialogVisible = false;
+            IsAddDialogVisible = false;
         }
 
         private void CloseEditDialog()
         {
-            isEditDialogVisible = false;
+            IsEditDialogVisible = false;
         }
 
         private void Logout()

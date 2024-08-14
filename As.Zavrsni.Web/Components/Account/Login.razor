@@ -1,18 +1,19 @@
 ﻿@page "/"
 @page "/login"
-
+<div class="bg-blue-400 text-black font-bold justify-center text-center text-3xl">Gastro Flow</div>
 <div class="flex justify-center min-h-screen bg-blue-400 items-center">
+    
     <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm">
-        <h3 class="text-2xl font-bold mb-4 text-center">Login</h3>
+        <h3 class="text-2xl font-bold mb-4 text-center">Prijava</h3>
 
         <EditForm Model="Model" OnValidSubmit="HandleLogin" FormName="login" method="post">
             <div class="mb-4">
-                <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
+                <label for="username" class="block text-sm font-medium text-gray-700">Korisničko ime</label>
                 <InputText id="username" @bind-Value="Model.Username" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm 
                                                                                 focus:outline-none focus:ring-blue-500 focus:border-blue-500" />
             </div>
             <div class="mb-6">
-                <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                <label for="password" class="block text-sm font-medium text-gray-700">Lozinka</label>
                 <InputText id="password" @bind-Value="Model.Password" type="password" class="mt-1 block w-full p-2 
                                                                     border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" />
             </div>

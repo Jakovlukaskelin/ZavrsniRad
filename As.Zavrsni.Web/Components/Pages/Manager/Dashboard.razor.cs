@@ -35,28 +35,27 @@ namespace As.Zavrsni.Web.Components.Pages.Manager
         public List<ProductsModel> FilterProducts { get; set; } = new List<ProductsModel>();
         public string SelectedView { get; set; } = "proizvode";
 
-        private ProductsModel newProduct = new ProductsModel();
+        private ProductsModel NewProduct = new ProductsModel();
 
-        private bool isAddingProduct = false;
-      
+        private bool IsAddingProduct = false;
         public DateTime StartDate { get; set; } = DateTime.Today;
         public DateTime EndDate { get; set; } = DateTime.Today;
 
-        private ProductsModel selectedProduct;
-        private bool isWarningDialogVisible = false;
+        private ProductsModel SelectedProduct;
+        
         private List<ProductsModel> duplicateProducts = new List<ProductsModel>();
 
-        private bool isEditingProduct = false;
+        private bool IsEditingProduct = false;
         protected override async Task OnInitializedAsync()
         {
-           
+
             Products = await Mediator.Send(new GetProductListQuery());
             Consumption = await Mediator.Send(new GetConsumptionQuery());
             FilterProducts = Products;
             currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
             NavigationManager.LocationChanged += OnLocationChanged;
             FilterData();
-            
+
         }
 
 
@@ -85,10 +84,10 @@ namespace As.Zavrsni.Web.Components.Pages.Manager
                 DateOnly startDate = DateOnly.FromDateTime(StartDate);
                 DateOnly endDate = DateOnly.FromDateTime(EndDate);
 
-                
+
                 if (StartDate == DateTime.Today && EndDate == DateTime.Today)
                 {
-                    
+
                     FilterProducts = Consumption
                         .GroupBy(c => new { c.ProductName, c.ConsumptionDate })
                         .Select(group => new ProductsModel
@@ -102,7 +101,7 @@ namespace As.Zavrsni.Web.Components.Pages.Manager
                 }
                 else
                 {
-                    
+
                     FilterProducts = Consumption
                         .Where(c => c.ConsumptionDate.HasValue &&
                                     c.ConsumptionDate.Value >= startDate &&
@@ -114,7 +113,7 @@ namespace As.Zavrsni.Web.Components.Pages.Manager
                             ProductType = "potrošnja",
                             ExpiryDate = group.Key.ConsumptionDate,
                             Quantity = group.Sum(c => c.Quantity)
-                        })
+                        }).OrderBy(x => x.ExpiryDate)
                         .ToList();
                 }
             }
@@ -125,9 +124,9 @@ namespace As.Zavrsni.Web.Components.Pages.Manager
 
             StateHasChanged();
         }
-        
-       
-        
+
+
+
 
         public void Dispose()
         {
@@ -135,33 +134,33 @@ namespace As.Zavrsni.Web.Components.Pages.Manager
         }
         private void ShowAddProductForm()
         {
-            newProduct = new ProductsModel();
-            isAddingProduct = true;
+            NewProduct = new ProductsModel();
+            IsAddingProduct = true;
         }
 
         private void CancelAddProduct()
         {
-            isAddingProduct = false;
+            IsAddingProduct = false;
         }
         private async Task AddProductToDatabase()
         {
             var entity = new Product
             {
-                ProductName = newProduct.ProductName,
+                ProductName = NewProduct.ProductName,
                 ProductType = "",
-                ExpiryDate = newProduct.ExpiryDate,
-                Quantity = newProduct.Quantity
+                ExpiryDate = NewProduct.ExpiryDate,
+                Quantity = NewProduct.Quantity
             };
 
             _context.Products.Add(entity);
             await _context.SaveChangesAsync();
-            isAddingProduct = false;
+            IsAddingProduct = false;
             NavManager.NavigateTo(NavManager.Uri, forceLoad: true);
         }
         private void EditProduct(ProductsModel product)
         {
-           
-            selectedProduct = new ProductsModel
+
+            SelectedProduct = new ProductsModel
             {
                 ProductId = product.ProductId,
                 ProductName = product.ProductName,
@@ -170,31 +169,31 @@ namespace As.Zavrsni.Web.Components.Pages.Manager
                 Quantity = product.Quantity
             };
 
-            isEditingProduct = true; 
+            IsEditingProduct = true;
         }
 
         private void CancelEditProduct()
         {
-            isEditingProduct = false; 
+            IsEditingProduct = false;
         }
 
         private async Task UpdateProductInDatabase()
         {
-            // Find the product in the database context
-            var productEntity = await _context.Products.FindAsync(selectedProduct.ProductId);
+          
+            var productEntity = await _context.Products.FindAsync(SelectedProduct.ProductId);
 
             if (productEntity != null)
             {
-               
-                productEntity.ProductName = selectedProduct.ProductName;
-                productEntity.ProductType = selectedProduct.ProductType;
-                productEntity.ExpiryDate = selectedProduct.ExpiryDate;
-                productEntity.Quantity = selectedProduct.Quantity;
 
-              
+                productEntity.ProductName = SelectedProduct.ProductName;
+                productEntity.ProductType = SelectedProduct.ProductType;
+                productEntity.ExpiryDate = SelectedProduct.ExpiryDate;
+                productEntity.Quantity = SelectedProduct.Quantity;
+
+
                 await _context.SaveChangesAsync();
 
-                isEditingProduct = false;
+                IsEditingProduct = false;
                 NavManager.NavigateTo(NavManager.Uri, forceLoad: true);
 
 
@@ -203,12 +202,12 @@ namespace As.Zavrsni.Web.Components.Pages.Manager
 
         private async Task DeleteProduct(ProductsModel product)
         {
-            
+
             var productEntity = await _context.Products.FindAsync(product.ProductId);
 
             if (productEntity != null)
             {
-                
+
                 _context.Products.Remove(productEntity);
                 await _context.SaveChangesAsync();
 
@@ -216,19 +215,7 @@ namespace As.Zavrsni.Web.Components.Pages.Manager
                 NavManager.NavigateTo(NavManager.Uri, forceLoad: true);
             }
         }
-       
-        private void ShowWarningDialog(string productName)
-        {
-            
-            duplicateProducts = FilterProducts
-                .Where(p => p.ProductName == productName)
-                .ToList();
 
-            isWarningDialogVisible = true;
-        }
-        private void CloseWarningDialog()
-        {
-            isWarningDialogVisible = false;
-        }
+
     }
 }

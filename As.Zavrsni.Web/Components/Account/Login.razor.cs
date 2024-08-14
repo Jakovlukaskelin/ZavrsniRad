@@ -1,4 +1,5 @@
 ﻿using As.Zavrsni.Aplication.Interface;
+using As.Zavrsni.Aplication.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Identity;
@@ -7,10 +8,7 @@ namespace As.Zavrsni.Web.Components.Account
 {
     public partial class Login : ComponentBase
     {
-        [CascadingParameter]
-        public HttpContext HttpContext { get; set; } = default!;
-
-
+       
         [SupplyParameterFromForm]
         LoginModel Model { get; set; } = new LoginModel();
 
@@ -19,7 +17,9 @@ namespace As.Zavrsni.Web.Components.Account
 
         [Inject]
         private IAuthService AuthService { get; set; }
-
+        [Inject]
+        private UserService UserService { get; set; }
+        private string username;
         public string ErrorMessage { get; set; }
         protected override async Task OnInitializedAsync()
         {
@@ -32,7 +32,9 @@ namespace As.Zavrsni.Web.Components.Account
         {
             try
             {
+                
                 var user = await AuthService.Login(Model.Username, Model.Password);
+                UserService.SetLoggedInUsername(Model.Username);
                 if (user != null)
                 {
                     switch (user.RoleId)
@@ -40,19 +42,19 @@ namespace As.Zavrsni.Web.Components.Account
                         case 1:
                             NavigationManager.NavigateTo("/waiter");
                             break;
-                        case 2:
-                            NavigationManager.NavigateTo("/manager");
-                            break;
                         case 3:
+                            NavigationManager.NavigateTo("/dashboard");
+                            break;
+                        case 2:
                             NavigationManager.NavigateTo("/chef");
                             break;
                         default:
-                            throw new Exception("User role not recognized");
+                            break;
                     }
                 }
                 else
                 {
-                    ErrorMessage = "Invalid username or password";
+                    ErrorMessage = "Korisničko ime ili lozinka je netočno";
                 }
                 
             }

@@ -33,6 +33,7 @@ builder.Services.AddAutoMapper(new Assembly[] { typeof(AutoMapperProfile).GetTyp
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining(typeof(GetProductListQuery)));
 builder.Services.AddSyncfusionBlazor();
+builder.Services.AddSingleton<UserService>();
 builder.Services.AddScoped<IMediator, Mediator>();
 builder.Services.AddAuthentication(options =>
 {
@@ -41,7 +42,7 @@ builder.Services.AddAuthentication(options =>
     options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
 }).AddCookie(
    options =>  options.LoginPath = "/login" );
-SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NCaF1cWWhBYVJyWmFZfVpgcF9GYVZQQ2YuP1ZhSXxXdk1jXn9acHVUQWlZV0Q=");
+SyncfusionLicenseProvider.RegisterLicense("MzQyODQzM0AzMjM2MmUzMDJlMzBTbGRCS2svY3psbGsvWkpmNkUwVGk0L1k2TmM4cHRaazFIaTdQY0JMR01FPQ==");
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

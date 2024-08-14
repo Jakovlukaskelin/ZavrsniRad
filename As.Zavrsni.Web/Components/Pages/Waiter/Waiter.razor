@@ -1,5 +1,6 @@
 ﻿@page "/Waiter"
 @using As.Zavrsni.Aplication.Products.Model
+@using As.Zavrsni.Aplication.Services
 @using Syncfusion.Blazor.DropDowns
 @using Syncfusion.Blazor.Grids
 @using Syncfusion.Blazor
@@ -7,12 +8,17 @@
 @using Syncfusion.Blazor.Inputs
 @using Syncfusion.Blazor.Notifications
 @using Syncfusion.Blazor.Popups
-
+@inject UserService UserService
 <div class="text-3xl font-bold mb-4 text-center">
-    Dobrodošli
+    <h1 class="text-3xl font-bold mb-6">
+        @if (!string.IsNullOrEmpty(UserService.LoggedInUsername))
+        {
+            <span>Dobrodošli @UserService.LoggedInUsername</span>
+        }
+    </h1>
 </div>
 <div >
-    <button class="py-2 px-4 text-black hover:bg-red-600  bg-red-300 rounded" @onclick="() => Logout()">Logout</button>
+    <button class="py-2 px-4 text-black hover:bg-red-600  bg-red-300 rounded" @onclick="() => Logout()">Odjavi</button>
 </div>
 <div class="flex justify-center mb-4">
     <button class="py-2 px-4 bg-green-500 text-black rounded mx-2" @onclick='() => OnProductTypeChange("Hrana")'>Hrana</button>
@@ -39,7 +45,7 @@
                 <GridColumn Field="@nameof(ProductsModel.ProductType)" HeaderText="Vrsta" Width="150"></GridColumn>
                 <GridColumn Field="@nameof(ProductsModel.Quantity)" HeaderText="Količina" Width="100"></GridColumn>
                 <GridColumn Field="@nameof(ProductsModel.ExpiryDate)" HeaderText="Rok trajanja" Format="dd/MM/yyyy" Width="150"></GridColumn>
-                <GridColumn HeaderText="Select" Width="100" TextAlign="TextAlign.Center">
+                <GridColumn HeaderText="Odabir" Width="100" TextAlign="TextAlign.Center">
                     <Template>
                         @{
                             var product = context as ProductsModel;
@@ -49,7 +55,7 @@
                         {
                             <SfButton CssClass="e-warning" Content="⚠️" @onclick="() => ShowWarningDialog(product.ProductName)" />
                         }
-                        <button class="py-2 px-4 bg-blue-500 text-black rounded" @onclick="() => SelectProduct(product)">Select</button>
+                        <button class="py-2 px-4 bg-blue-500 text-black rounded" @onclick="() => SelectProduct(product)">Dodaj</button>
                     </Template>
                 </GridColumn>
             </GridColumns>
@@ -58,22 +64,22 @@
 
     <div class="flex-1 ml-4">
         <div class="p-4 border border-gray-200 rounded">
-            <h2 class="text-xl font-bold mb-4">Order Product</h2>
+            <h2 class="text-xl font-bold mb-4">Naručeni proizvodi</h2>
             @if (selectedProduct != null)
             {
                 <div>
-                    <label class="block text-sm font-medium mb-2">Product Name: @selectedProduct.ProductName</label>
-                    <label class="block text-sm font-medium mb-2">Quantity:</label>
+                    <label class="block text-sm font-medium mb-2">Ime proizvoda: @selectedProduct.ProductName</label>
+                    <label class="block text-sm font-medium mb-2">Količina:</label>
                     <SfNumericTextBox TValue="int" @bind-Value="OrderQuantity" Min="1" Max="@selectedProduct.Quantity" Placeholder="Unesi količinu"></SfNumericTextBox>
                     <button class="mt-4 py-2 px-4 bg-blue-500 text-black rounded" @onclick="AddProductToOrder">Dodaj narudžbu</button>
                 </div>
             }
-            <h3 class="text-lg font-bold mt-4">Selected Products</h3>
+            <h3 class="text-lg font-bold mt-4">Odabrani proizvodi</h3>
             <ul>
                 @foreach (var item in orderItems)
                 {
                     <li class="flex justify-between mb-2">
-                        <span>@item.ProductName - Quantity: @item.Quantity</span>
+                        <span>@item.ProductName - količina: @item.Quantity</span>
                         <button class="ml-4 py-1 px-2 bg-red-500 text-black rounded" @onclick="() => RemoveProductFromOrder(item)">Izbriši</button>
                     </li>
                 }

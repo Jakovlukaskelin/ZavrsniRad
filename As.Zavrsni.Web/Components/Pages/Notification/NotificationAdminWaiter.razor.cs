@@ -25,9 +25,9 @@ namespace As.Zavrsni.Web.Components.Pages.Notification
                             .ToList();
         }
 
-        private async Task MarkAsAddressed(int notificationId, bool isChecked)
+        private async Task MarkAsAddressed(int notificationId, bool IsChecked)
         {
-            if (isChecked)
+            if (IsChecked)
             {
                 var notification = notifications.FirstOrDefault(n => n.NotificationId == notificationId);
                 if (notification != null)

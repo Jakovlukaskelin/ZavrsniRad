@@ -11,7 +11,7 @@ namespace As.Zavrsni.Web.Components.Pages.Manager
         [Inject]
         private NavigationManager NavManager { get; set; }
 
-        public Users users { get; set; } = new Users(); 
+        public UserModel users { get; set; } = new UserModel(); 
 
         private string? currentUrl;
 
@@ -31,7 +31,7 @@ namespace As.Zavrsni.Web.Components.Pages.Manager
         private void LoadUser()
         {
             
-            users.username = users.username;
+            users.Username = users.Username;
         }
         private void Logout()
         {

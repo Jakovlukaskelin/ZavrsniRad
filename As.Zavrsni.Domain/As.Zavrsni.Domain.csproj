@@ -31,6 +31,7 @@
     <PackageReference Include="Syncfusion.Blazor.Layouts" Version="26.2.8" />
     <PackageReference Include="Syncfusion.Blazor.Navigations" Version="26.2.8" />
     <PackageReference Include="Syncfusion.Blazor.Themes" Version="26.2.8" />
+    <PackageReference Include="System.Globalization" Version="4.3.0" />
   </ItemGroup>
 
 </Project>

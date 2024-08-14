@@ -1,4 +1,6 @@
 ﻿using As.Zavrsni.Aplication.Interface;
+using As.Zavrsni.Aplication.Model;
+using As.Zavrsni.Aplication.Model.Query;
 using As.Zavrsni.Aplication.Notifikacije.Model;
 using As.Zavrsni.Aplication.Notifikacije.Query;
 using As.Zavrsni.Aplication.Products.Model;
@@ -32,19 +34,20 @@ namespace As.Zavrsni.Web.Components.Pages.Chef
 
         private ProductsModel EditProductModel = new ProductsModel();
         private int UnreadNotificationsCount => NotificationModel.Count(n => !n.Status);
-
+        
         private SfToast ToastObj;
         private string toastMessage;
         private bool IsAddProductDialogVisible = false;
         private ProductsModel NewProduct = new ProductsModel();
         private HubConnection hubConnection;
-
+      
         protected override async Task OnInitializedAsync()
         {
             await base.OnInitializedAsync();
             Products = await Mediator.Send(new GetProductListQuery());
             Products = Products.Where(p => p.ProductType == "Hrana").ToList();
             Notifications = await Mediator.Send(new GetNotificationQuery());
+           
             await CheckExpiringProducts();
 
             hubConnection = new HubConnectionBuilder()
@@ -63,8 +66,8 @@ namespace As.Zavrsni.Web.Components.Pages.Chef
 
         private void ShowOrderNotification(string message)
         {
-            toastMessage = $"Order Update: {message}";
-            ToastObj.ShowAsync(new ToastModel { Title = "Order Update", Content = toastMessage });
+            toastMessage = $"Narudžba stigla: {message}";
+            ToastObj.ShowAsync(new ToastModel { Title = "Narudžba stigla", Content = toastMessage });
         }
 
         public void Dispose()

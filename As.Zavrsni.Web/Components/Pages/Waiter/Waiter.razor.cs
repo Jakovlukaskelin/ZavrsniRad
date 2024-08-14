@@ -1,4 +1,6 @@
 ﻿using As.Zavrsni.Aplication.Interface;
+using As.Zavrsni.Aplication.Model;
+using As.Zavrsni.Aplication.Model.Query;
 using As.Zavrsni.Aplication.Notifikacije.Model;
 using As.Zavrsni.Aplication.Notifikacije.Query;
 using As.Zavrsni.Aplication.Products.Model;
@@ -28,7 +30,7 @@ namespace As.Zavrsni.Web.Components.Pages.Waiter
         private NavigationManager NavigationManager { get; set; }
         public List<ProductsModel> Products { get; set; } = new List<ProductsModel>();
         public List<ProductsModel> filteredProducts { get; set; } = new List<ProductsModel>();
-         public string selectedProductType { get; set; }
+        public string selectedProductType { get; set; }
         public ProductsModel selectedProduct { get; set; }
         public List<NotificationModel> Notifications { get; set; } = new List<NotificationModel>();
         private int UnreadNotificationsCount => Notifications.Count(n => !n.Status);
@@ -36,19 +38,20 @@ namespace As.Zavrsni.Web.Components.Pages.Waiter
         private SfToast toast;
         private string toastMessage;
         public List<OrderItem> orderItems { get; set; } = new List<OrderItem>();
-
+       
         private HubConnection hubConnection;
         private string errorMessage;
         private List<ProductsModel> DuplicateProducts = new List<ProductsModel>();
         private bool isWarningDialogVisible = false;
-
+        
+      
         protected override async Task OnInitializedAsync()
         {
-          
+            
             Products = await Mediator.Send(new GetProductListQuery());
-           
             filteredProducts = Products;
             Notifications = await Mediator.Send(new GetNotificationQuery());
+           
             await CheckLowStockProducts();
             hubConnection = new HubConnectionBuilder().WithUrl(NavigationManager.ToAbsoluteUri("/orderhub")).Build();
             hubConnection.On<string>("ReceiveOrderUpdate", (message) =>
@@ -61,9 +64,9 @@ namespace As.Zavrsni.Web.Components.Pages.Waiter
 
         private void ShowOrderNotification(string message)
         {
-            toastMessage = $"Order Update: {message}";
-            toast.ShowAsync(new ToastModel { Title = "Order Update", Content = toastMessage });
-            
+            toastMessage = $"Narudžba: {message}";
+            toast.ShowAsync(new ToastModel { Title = "Narudžba", Content = toastMessage });
+
         }
 
         private void OnProductTypeChange(string productType)
@@ -82,7 +85,7 @@ namespace As.Zavrsni.Web.Components.Pages.Waiter
            .Select(g =>
            {
                var orderedProducts = g.OrderBy(p => p.ExpiryDate).ToList();
-               return orderedProducts.First(); 
+               return orderedProducts.First();
            })
            .OrderBy(x => x.ExpiryDate)
            .ToList();
@@ -90,7 +93,7 @@ namespace As.Zavrsni.Web.Components.Pages.Waiter
             else if (selectedProductType == "Pica")
             {
                 filteredProducts = Products
-                    .Where(p => p.ProductType == "Pica" && p.Quantity > 0)
+                    .Where(p => p.ProductType != "Hrana" && p.Quantity > 0)
                     .ToList();
             }
             else
@@ -200,14 +203,14 @@ namespace As.Zavrsni.Web.Components.Pages.Waiter
                 var orderDetails = string.Join(", ", orderItems.Select(i => $"{i.ProductName} (x{i.Quantity})"));
                 orderItems.Clear();
                 FilterProducts();
-               
+
                 await _context.SaveChangesAsync();
                 await LoadProducts();
                 StateHasChanged();
-               
+
                 if (allHrana)
                 {
-                    await hubConnection.SendAsync("SendOrderUpdate", $"New Hrana order submitted: {orderDetails}");
+                    await hubConnection.SendAsync("SendOrderUpdate", $"Narudžba: {orderDetails}");
                 }
             }
             catch (InvalidOperationException ex)
@@ -222,15 +225,15 @@ namespace As.Zavrsni.Web.Components.Pages.Waiter
         private async Task LoadProducts()
         {
             Products = await Mediator.Send(new GetProductListQuery());
-            
+
             FilterProducts();
             StateHasChanged();
         }
 
         private void ShowLowStockNotification(string productName, int quantity)
         {
-            toastMessage = $"Low stock alert: {productName} only has {quantity} items left.";
-            toast.ShowAsync(new ToastModel { Title = "Low Stock Alert", Content = toastMessage });
+            toastMessage = $"Niska količina: {productName} ostalo je još {quantity} komada .";
+            toast.ShowAsync(new ToastModel { Title = "Niska količina", Content = toastMessage });
         }
 
         private void Logout()
@@ -261,7 +264,7 @@ namespace As.Zavrsni.Web.Components.Pages.Waiter
 
             foreach (var product in lowStockProducts)
             {
-                string message = $"Low stock: {product.ProductName} only has {product.Quantity} items left.";
+                string message = $"Niska količina: {product.ProductName} ostalo je {product.Quantity} komada.";
 
                 if (!await NotificationExists(product.ProductId, message))
                 {
@@ -282,7 +285,7 @@ namespace As.Zavrsni.Web.Components.Pages.Waiter
 
             if (Notifications.Any())
             {
-                ShowNotificationToast("You have new notifications.");
+                ShowNotificationToast("Imaš novu notifikaciju.");
             }
         }
 
@@ -325,7 +328,7 @@ namespace As.Zavrsni.Web.Components.Pages.Waiter
         private void ShowNotificationToast(string message)
         {
             toastMessage = message;
-            toast.ShowAsync(new ToastModel { Title = "Notification", Content = toastMessage });
+            toast.ShowAsync(new ToastModel { Title = "Notifikacija", Content = toastMessage });
         }
     }
 
