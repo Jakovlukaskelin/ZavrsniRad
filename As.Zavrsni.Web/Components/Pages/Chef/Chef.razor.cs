@@ -3,6 +3,8 @@ using As.Zavrsni.Aplication.Model;
 using As.Zavrsni.Aplication.Model.Query;
 using As.Zavrsni.Aplication.Notifikacije.Model;
 using As.Zavrsni.Aplication.Notifikacije.Query;
+using As.Zavrsni.Aplication.Orders;
+using As.Zavrsni.Aplication.Orders.NewFolder.Query;
 using As.Zavrsni.Aplication.Products.Model;
 using As.Zavrsni.Aplication.Products.Query;
 using As.Zavrsni.Domain.Entites;
@@ -34,7 +36,7 @@ namespace As.Zavrsni.Web.Components.Pages.Chef
 
         private ProductsModel EditProductModel = new ProductsModel();
         private int UnreadNotificationsCount => NotificationModel.Count(n => !n.Status);
-        
+        public List<OrderModel> Orders { get; set; } = new List<OrderModel>(); 
         private SfToast ToastObj;
         private string toastMessage;
         private bool IsAddProductDialogVisible = false;
@@ -60,7 +62,7 @@ namespace As.Zavrsni.Web.Components.Pages.Chef
                 await LoadProducts();
                 await InvokeAsync(StateHasChanged);
             });
-
+            
             await hubConnection.StartAsync();
         }
 
@@ -74,6 +76,10 @@ namespace As.Zavrsni.Web.Components.Pages.Chef
         {
             _ = hubConnection?.DisposeAsync();
         }
+        private void NavigateToOrderPage()
+        {
+            NavigationManager.NavigateTo("/orders");
+        }
         private void NavigateToNotificationsPage()
         {
             NavigationManager.NavigateTo("/notifications");
@@ -82,6 +88,7 @@ namespace As.Zavrsni.Web.Components.Pages.Chef
         {
             Products = await Mediator.Send(new GetProductListQuery());
             Products = Products.Where(p => p.ProductType == "Hrana").ToList();
+            Orders = await Mediator.Send(new GetOrdersQuery());
             await CheckExpiringProducts();
         }
         private async Task CheckExpiringProducts()

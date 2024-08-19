@@ -21,7 +21,8 @@ namespace As.Zavrsni.Web.Components.Pages.Notification
 
             notifications = await Mediator.Send(new GetNotificationQuery());
             notifications = notifications
-                            .Where(n => n.Quantity < 10 || (n.ExpiryDate.HasValue && n.ExpiryDate.Value <= DateOnly.FromDateTime(DateTime.Today.AddDays(3))))
+                            .Where(n => n.Quantity < 10 ||
+                                        (n.ExpiryDate.HasValue && n.ExpiryDate.Value >= DateOnly.FromDateTime(DateTime.Today)))
                             .ToList();
         }
 

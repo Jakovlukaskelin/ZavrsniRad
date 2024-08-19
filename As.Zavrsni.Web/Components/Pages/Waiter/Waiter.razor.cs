@@ -3,10 +3,13 @@ using As.Zavrsni.Aplication.Model;
 using As.Zavrsni.Aplication.Model.Query;
 using As.Zavrsni.Aplication.Notifikacije.Model;
 using As.Zavrsni.Aplication.Notifikacije.Query;
+using As.Zavrsni.Aplication.Orders;
+using As.Zavrsni.Aplication.Orders.NewFolder.Query;
 using As.Zavrsni.Aplication.Products.Model;
 using As.Zavrsni.Aplication.Products.Query;
 using As.Zavrsni.Domain.Entites;
 using As.Zavrsni.Web.Components.Pages.Notification;
+using Elastic.Clients.Elasticsearch;
 using MediatR;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -38,7 +41,7 @@ namespace As.Zavrsni.Web.Components.Pages.Waiter
         private SfToast toast;
         private string toastMessage;
         public List<OrderItem> orderItems { get; set; } = new List<OrderItem>();
-       
+        private List<OrderModel> Orders;
         private HubConnection hubConnection;
         private string errorMessage;
         private List<ProductsModel> DuplicateProducts = new List<ProductsModel>();
@@ -51,7 +54,7 @@ namespace As.Zavrsni.Web.Components.Pages.Waiter
             Products = await Mediator.Send(new GetProductListQuery());
             filteredProducts = Products;
             Notifications = await Mediator.Send(new GetNotificationQuery());
-           
+            Orders = await Mediator.Send(new GetOrdersQuery());
             await CheckLowStockProducts();
             hubConnection = new HubConnectionBuilder().WithUrl(NavigationManager.ToAbsoluteUri("/orderhub")).Build();
             hubConnection.On<string>("ReceiveOrderUpdate", (message) =>
@@ -77,18 +80,20 @@ namespace As.Zavrsni.Web.Components.Pages.Waiter
 
         private async void FilterProducts()
         {
+            DateOnly today = DateOnly.FromDateTime(DateTime.Today);
+
             if (selectedProductType == "Hrana")
             {
                 filteredProducts = Products
-           .Where(p => p.ProductType == "Hrana" && p.Quantity > 0)
-           .GroupBy(p => p.ProductName)
-           .Select(g =>
-           {
-               var orderedProducts = g.OrderBy(p => p.ExpiryDate).ToList();
-               return orderedProducts.First();
-           })
-           .OrderBy(x => x.ExpiryDate)
-           .ToList();
+                    .Where(p => p.ProductType == "Hrana" && p.Quantity > 0 && p.ExpiryDate.HasValue && p.ExpiryDate.Value >= today)
+                    .GroupBy(p => p.ProductName)
+                    .Select(g =>
+                    {
+                        var orderedProducts = g.OrderBy(p => p.ExpiryDate).ToList();
+                        return orderedProducts.First();
+                    })
+                    .OrderBy(x => x.ExpiryDate)
+                    .ToList();
             }
             else if (selectedProductType == "Pica")
             {
@@ -174,6 +179,7 @@ namespace As.Zavrsni.Web.Components.Pages.Waiter
                     }
 
                     var product = await _context.Products.FirstOrDefaultAsync(p => p.ProductName == item.ProductName);
+                    var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == u.Username);
                     if (product != null)
                     {
                         if (string.IsNullOrEmpty(product.ProductType))
@@ -189,18 +195,31 @@ namespace As.Zavrsni.Web.Components.Pages.Waiter
                             ConsumptionDate = DateOnly.FromDateTime(DateTime.Now),
                             Quantity = item.Quantity,
                             Type = product.ProductType
-                        };
 
+                        };
+                        var order  = new Order
+                        {
+                            User  = user,
+                            Product = product,
+                            ProductId = product.ProductId,
+                            OrderDate = DateOnly.FromDateTime(DateTime.Now).ToDateTime(TimeOnly.MaxValue),
+                            Quantity = item.Quantity,
+
+
+                        };
+                        _context.Orders.Add(order);
                         _context.Consumptions.Add(consumption);
                         _context.Products.Update(product);
+                        await _context.SaveChangesAsync();
                     }
                 }
-                bool allHrana = orderItems.All(item =>
+                bool allHrana = orderItems.Any(item =>
                 {
                     var product = Products.FirstOrDefault(p => p.ProductName == item.ProductName);
                     return product != null && product.ProductType == "Hrana";
                 });
-                var orderDetails = string.Join(", ", orderItems.Select(i => $"{i.ProductName} (x{i.Quantity})"));
+                var orderDetails = string.Join(", ", orderItems.Where(i => Products.Any(p => p.ProductName == i.ProductName && p.ProductType == "Hrana"))
+                                            .Select(i => $"{i.ProductName} (x{i.Quantity})"));
                 orderItems.Clear();
                 FilterProducts();
 
@@ -242,13 +261,19 @@ namespace As.Zavrsni.Web.Components.Pages.Waiter
         }
         private void ShowWarningDialog(string productName)
         {
+            DateOnly today = DateOnly.FromDateTime(DateTime.Today);
 
+            
             DuplicateProducts = Products
-                .Where(p => p.ProductName == productName)
+                .Where(p => p.ProductName == productName && p.ExpiryDate.HasValue && p.ExpiryDate.Value >= today)
                 .OrderBy(p => p.ExpiryDate)
                 .ToList();
 
-            isWarningDialogVisible = true;
+            
+            if (DuplicateProducts.Count > 1)
+            {
+                isWarningDialogVisible = true;
+            }
         }
         private void CloseWarningDialog()
         {

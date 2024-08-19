@@ -165,15 +165,10 @@
     </EditForm>
 </SfDialog>
 
-@* <SfDialog @bind-Visible="isWarningDialogVisible" Width="500px" Header="Duplicate Products" ShowCloseIcon="true">
-    <div>
-        <h4>Products with the same name:</h4>
-        <ul>
-            @foreach (var product in duplicateProducts)
-            {
-                <li>@product.ProductName ima još @product.Quantity datum isteka roka je @product.ExpiryDate?.ToString("d")</li>
-            }
-        </ul>
-        <SfButton CssClass="e-primary" Content="Close" @onclick="CloseWarningDialog" />
+<SfDialog @bind-Visible="IsDeleteConfirmationVisible" Width="300px" Header="Potvrda brisanja" ShowCloseIcon="true" Overlay="true">
+    <div class="dialog-description">
+        <p>Proizvod se nalazi u potrošnji ili u notifikaciji. Da li ste sigurni da želite izbrisati proizvod?</p>
     </div>
-</SfDialog> *@
+    <SfButton CssClass="e-danger" Content="Izbriši" @onclick="ConfirmDeleteProduct" />
+    <SfButton CssClass="e-secondary" Content="Odustani" @onclick="CancelDeleteProduct" />
+</SfDialog>

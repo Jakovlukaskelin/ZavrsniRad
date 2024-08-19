@@ -46,6 +46,8 @@ namespace As.Zavrsni.Web.Components.Pages.Manager
         private List<ProductsModel> duplicateProducts = new List<ProductsModel>();
 
         private bool IsEditingProduct = false;
+        private bool IsDeleteConfirmationVisible = false;
+        private ProductsModel ProductToDelete;
         protected override async Task OnInitializedAsync()
         {
 
@@ -126,8 +128,6 @@ namespace As.Zavrsni.Web.Components.Pages.Manager
         }
 
 
-
-
         public void Dispose()
         {
             NavigationManager.LocationChanged -= OnLocationChanged;
@@ -203,19 +203,52 @@ namespace As.Zavrsni.Web.Components.Pages.Manager
         private async Task DeleteProduct(ProductsModel product)
         {
 
-            var productEntity = await _context.Products.FindAsync(product.ProductId);
+            var productEntity = await _context.Products
+                .Include(p => p.Notifications)
+            .Include(p => p.Consumptions)
+            .Include(p => p.Orders)
+            .FirstOrDefaultAsync(p => p.ProductId == product.ProductId);
 
             if (productEntity != null)
             {
-
-                _context.Products.Remove(productEntity);
-                await _context.SaveChangesAsync();
-
-
-                NavManager.NavigateTo(NavManager.Uri, forceLoad: true);
+                if (productEntity.Consumptions.Any() || productEntity.Notifications.Any())
+                {
+                    ProductToDelete = product;
+                    IsDeleteConfirmationVisible = true;
+                }
+                else
+                {
+                    _context.Products.Remove(productEntity);
+                    await _context.SaveChangesAsync();
+                    NavManager.NavigateTo(NavManager.Uri, forceLoad: true);
+                }
             }
         }
+        private async Task ConfirmDeleteProduct()
+        {
+            if (ProductToDelete != null)
+            {
+                var productEntity = await _context.Products
+                    .Include(p => p.Consumptions)
+                    .Include(p => p.Notifications)
+                    .Include(p => p.Orders)
+                    .FirstOrDefaultAsync(p => p.ProductId == ProductToDelete.ProductId);
 
+                if (productEntity != null)
+                {
+                    _context.Products.Remove(productEntity);
+                    await _context.SaveChangesAsync();
+                    NavManager.NavigateTo(NavManager.Uri, forceLoad: true);
+                }
+            }
+            IsDeleteConfirmationVisible = false;
+        }
 
+        private void CancelDeleteProduct()
+        {
+            IsDeleteConfirmationVisible = false;
+        }
     }
+
 }
+

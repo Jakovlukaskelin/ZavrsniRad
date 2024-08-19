@@ -1,0 +1,58 @@
+﻿
+@page "/orders"
+@using Syncfusion.Blazor.Popups
+
+
+<h3 class="text-xl font-semibold mb-4">Orders</h3>
+
+@if (orders == null || orders.Count == 0)
+{
+    <p class="text-gray-500">No orders found.</p>
+}
+else
+{
+    <div class="overflow-x-auto">
+        <table class="min-w-full bg-white border border-gray-200 rounded-lg shadow-sm">
+            <thead>
+                <tr class="bg-gray-800 text-white">
+                    <th class="py-3 px-6 text-left">Order ID</th>
+                    <th class="py-3 px-6 text-left">Korisnik</th>
+                    <th class="py-3 px-6 text-left">Naziv</th>
+                    <th class="py-3 px-6 text-left">Datum</th>
+                    <th class="py-3 px-6 text-left">Količina</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in orders)
+                {
+                    <tr class="border-b border-gray-200 hover:bg-gray-100">
+                        <td class="py-3 px-6 cursor-pointer text-blue-500" @onclick="() => ShowOrderDetails(order.OrderId)">
+                            @order.OrderId
+                        </td>
+                        <td class="py-3 px-6">@order.UserName</td>
+                        <td class="py-3 px-6">@order.ProductName</td>
+                        <td class="py-3 px-6">@order.OrderDate</td>
+                        <td class="py-3 px-6">@order.Quantity</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+<SfDialog Width="450px" @bind-Visible="isDialogVisible" IsModal="true" Header="Order Details" ShowCloseIcon="true">
+    <div>
+        <h4 class="text-lg font-semibold mb-4">Order ID: @modalOrderId</h4>
+        <ul class="list-disc list-inside mb-4">
+            @foreach (var product in selectedProducts)
+            {
+                <li>@product.ProductId: @product.ProductName</li>
+            }
+        </ul>
+    </div>
+    <DialogTemplates>
+        <Footer>
+            <SfButton CssClass="e-primary" @onclick="CloseDialog">Close</SfButton>
+        </Footer>
+    </DialogTemplates>
+</SfDialog>

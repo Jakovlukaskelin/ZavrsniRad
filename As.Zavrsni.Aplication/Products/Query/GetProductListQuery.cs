@@ -32,7 +32,9 @@ namespace As.Zavrsni.Aplication.Products.Query
         {
             var productEntities = await this._context.Products
                  .AsNoTracking()
-                 .Include(p => p.Consumptions)
+                  .Include(p => p.Consumptions)
+                  .Include(p => p.Notifications)
+                  .Include(p => p.Orders)
                 .ProjectTo<ProductsModel>(_mapper.ConfigurationProvider)
                 .ToListAsync(cancellationToken);
 

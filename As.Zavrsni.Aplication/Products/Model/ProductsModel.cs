@@ -19,6 +19,7 @@ namespace As.Zavrsni.Aplication.Products.Model
 
         public DateOnly? ExpiryDate { get; set; }
 
+        public bool IsDeleted { get; set; }
         public int Quantity { get; set; }
 
         public void CreateMappings(Profile configuration)
@@ -31,7 +32,7 @@ namespace As.Zavrsni.Aplication.Products.Model
                 .ForMember(dest => dest.ProductType, opt => opt.MapFrom(src => src.Product.ProductType))
                 .ForMember(dest => dest.ExpiryDate, opt => opt.MapFrom(src => src.Product.ExpiryDate))
                 .ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.Quantity));
-               
+            
         }
     }
 }
